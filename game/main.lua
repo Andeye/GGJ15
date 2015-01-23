@@ -7,6 +7,10 @@ love.filesystem.load("gamestate.lua")()
 love.filesystem.load("gui.lua")()
 love.filesystem.load("game.lua")()
 
+-- Elevator class
+love.filesystem.load("elevator.lua")()
+local elevator = Elevator:new()
+
 function love.livereload()
 	love.load()
 end
@@ -28,6 +32,8 @@ end
 function love.draw()
 	GameState:draw()
 	GUI:draw()
+	
+	elevator:draw()
 
 	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.print("FPS: "..love.timer.getFPS(), 10, 10)
