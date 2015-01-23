@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildpath>
+	<buildpathentry kind="src" path="game"/>
+	<buildpathentry kind="lib" path="LOVELuaDoc-master.zip"/>
+</buildpath>
