@@ -1,5 +1,5 @@
 
-require("External/livecode/livecode")
+require("external/livecode/livecode")
 
 love.filesystem.load("dbg.lua")()
 dbg = Debug:new()
