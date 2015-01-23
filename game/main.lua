@@ -21,6 +21,11 @@ function love.load()
 	print(dbg:serialize(game))
 end
 
+function love.update(dt)
+	GameState:update(dt)
+	GUI:update(dt)
+end
+
 function love.draw()
 	GameState:draw()
 	GUI:draw()
