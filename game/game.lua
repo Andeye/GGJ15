@@ -42,18 +42,28 @@ local function createCharacter(x, y)
   return character
 end
 
+
+local function sendGlobalEvent(self, type)
+  print("send global event")
+  local newEvent = EventTypes:getEvent(self.player, type)
+  for i, character in ipairs(self.characterList) do
+    self.characterList[i]:event(newEvent)
+  end
+end
+
+
 local buttonOffsetX = 30
 local buttonOffsetY = 30
 local buttonList = {}
 
 local function createButton(title, eventTrigger)
   local x = elevator.x + elevator.elevatorImage:getWidth() * elevator.scale + buttonOffsetX
-  
+
   local y = buttonOffsetY
   if #buttonList > 0 then
     y = buttonList[#buttonList].y + buttonList[#buttonList].height + buttonOffsetY
   end
-  
+
   local button = Button:new{
     x = x,
     y = y,
@@ -89,22 +99,12 @@ function Game:new()
   character = createCharacter(800, 250)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
-  
+
   self.player = createCharacter(650, 350)
   table.insert(self.drawables, self.player)
 
-  GUI:addComponent(createButton("Dance", function()
-    local newEvent = EventTypes:getEvent(self.player, "dance")
-    for i, character in ipairs(self.characterList) do
-      self.characterList[i]:event(newEvent)
-    end
-  end))
-  GUI:addComponent(createButton("Calm down", function()
-    local newEvent = EventTypes:getEvent(self.player, "calm_down")
-    for i, character in ipairs(self.characterList) do
-      self.characterList[i]:event(newEvent)
-    end
-  end))
+  GUI:addComponent(createButton("Dance", function() sendGlobalEvent(self, "dance") end))
+  GUI:addComponent(createButton("Calm down", function() sendGlobalEvent(self, "calm_down") end))
 
   return self
 end
