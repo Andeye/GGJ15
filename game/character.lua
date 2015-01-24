@@ -1,6 +1,4 @@
-CharacterPrms = {
-  image = love.graphics.newImage("assets/graphics/gubbskelett.png"),
-}
+CharacterPrms = {}
 
 Character = {
   animations = nil,
@@ -21,11 +19,7 @@ function Character:new(x, y, personality)
   self.animations = {}
   self.x = x or self.x
   self.y = y or self.y
-
   self.personality = personality
-
-  self.image = CharacterPrms.image
-  self.scale = love.window:getHeight() / self.image:getHeight() / 2
 
   return self
 end

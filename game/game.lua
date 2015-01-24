@@ -37,10 +37,6 @@ local function createCharacter(x, y)
 
   character:addAnimation("test", Animation:new(image, quadArray, timeArray, scale))
 
---  local faceImage = love.graphics.newImage("assets/graphics/faces/face-test.png")
---  local faceQuadArray = AnimationParser:parse(faceImage, 1, 5, 1)
---  character:setFaces(faceImage, faceQuadArray, 88, 48)
-
   return character
 end
 
@@ -54,12 +50,15 @@ function Game:new()
   local character = createCharacter(450, 300)
   table.insert(characterList, character)
   table.insert(drawables, character)
+  
   character = createCharacter(650, 300)
   table.insert(characterList, character)
   table.insert(drawables, character)
+  
   character = createCharacter(630, 350)
   table.insert(characterList, character)
   table.insert(drawables, character)
+  
   player = createCharacter(550, 150)
   table.insert(characterList, player)
   table.insert(drawables, player)
