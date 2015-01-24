@@ -7,6 +7,8 @@ dbg = Debug:new()
 love.filesystem.load("gamestate.lua")()
 love.filesystem.load("gui.lua")()
 love.filesystem.load("game.lua")()
+love.filesystem.load("button.lua")()
+love.filesystem.load("utility.lua")()
 
 function love.livereload()
   love.load()

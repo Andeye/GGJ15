@@ -14,6 +14,7 @@
 GUI = {
 	components,
 	last,
+	lastPressed,
 	layers,
 }
 
@@ -136,6 +137,7 @@ function love.mousepressed(x, y, button)
 	if component then
 		if component.mousepressed then
 			component:mousepressed(x, y, button)
+      GUI.lastPressed = component
 		end
 		GUI.mousedown = component
 	else
@@ -149,6 +151,9 @@ function love.mousereleased(x, y, button)
 	if component then
 		if component.mousereleased then
 			component:mousereleased(x, y, button)
+      if component == GUI.lastPressed then
+        GUI.lastPressed = nil
+      end
 		end
 		if component.onDragDrop and GUI.draggable then
 			component:onDragDrop(GUI.draggable)
@@ -156,6 +161,9 @@ function love.mousereleased(x, y, button)
 			component:onClick(x, y, button)
 		end
 	end
+  if GUI.lastPressed then
+    GUI.lastPressed:mousereleased(x, y, button)
+  end
 	GUI.mousedown = false
 	GUI.draggable = nil
 end

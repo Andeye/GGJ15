@@ -8,6 +8,7 @@ ElevatorPrms = {
   shaftImage = love.graphics.newImage("assets/graphics/elevator/shaft.png"),
   x = 0,
   y = 0,
+  tween,
 }
 
 local MAX_DOOR_OFFSET = 100
@@ -77,6 +78,9 @@ function Elevator:closeDoors()
   self.currentDoorState = DOOR_STATES.CLOSING
 end
 
+function Elevator:moveTo(y)
+  self.tween = tween.new(2, self, {y=y})
+end
 
 function Elevator:update(dt)
   dbg:msg("doorOffset", self.doorOffset)
@@ -88,6 +92,9 @@ function Elevator:update(dt)
     updateCloseDoors(self, dt)
   end
 
+  if self.tween then
+    self.tween:update(dt)
+  end 
 end
 
 

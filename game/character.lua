@@ -68,6 +68,7 @@ function Character:update(dt)
     self.tween:update(dt)
   end
 
+  dbg:msg("-----------------------------------", "")
   dbg:msg("character.awkward", self.awkward)
   dbg:msg("character.panic", self.panic)
 end
