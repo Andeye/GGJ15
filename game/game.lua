@@ -75,11 +75,12 @@ function addSpecialSpriteSheets(player)
   local quads = 10
   local specialAnimations = {}
   local scale = nil
+  local quadWidth = nil
   for i = 1, totalRows do
-    specialAnimations[i], scale = AnimationParser:parseSpecialSpritesheet(mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
+    specialAnimations[i], scale, quadWidth = AnimationParser:parseSpecialSpritesheet(mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
   end
-  player:addSpecialAnimation("handwave", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[1], quads, 1))
---  player:addSpecialAnimation("calm_down", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[2], quads, 1))
+  player:addSpecialAnimation("handwave", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[1], scale, quadWidth, 100))
+  player:addSpecialAnimation("calm_down", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[2], scale, quadWidth, 100))
 end
 
 
@@ -143,6 +144,10 @@ function love.keypressed(key)
     game.characterList[1]:addPanic(-5)
   elseif key == "4" then
     game.characterList[1]:addPanic(5)
+  elseif key == "9" then
+    game.player:playSpecialAnimation("handwave")
+  elseif key == "0" then
+    game.player:playSpecialAnimation("calm_down")
   elseif key == "f" then
     SoundSfx:play("fart")
   elseif key == "m" then

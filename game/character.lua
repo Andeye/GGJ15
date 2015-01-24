@@ -63,10 +63,33 @@ function getPanicSpriteDuration(panic)
 end
 
 
+function Character:isSpecialAnimationPlaying()
+  local key = self.currentSpecialAnimationKey
+  return key ~= nil and self.specialAnimations[key]:isPlaying()
+end
+
+
+function Character:playSpecialAnimation(key)
+  if not self:isSpecialAnimationPlaying() and self.specialAnimations[key] ~= nil then
+    self.currentSpecialAnimationKey = key
+    self.specialAnimations[key]:play()
+  end
+end
+
+
 function Character:update(dt)
 
-  local panicSpriteDuration = getPanicSpriteDuration(self.panic)
-  self.animations[self.currentAnimationKey]:update(dt, panicSpriteDuration, self.awkward)
+  if self:isSpecialAnimationPlaying() then
+    local key = self.currentSpecialAnimationKey
+    self.specialAnimations[key]:update(dt)
+    if not self.specialAnimations[key]:isPlaying() then
+      self.currentSpecialAnimationKey = nil
+    end
+  else
+    local panicSpriteDuration = getPanicSpriteDuration(self.panic)
+    self.animations[self.currentAnimationKey]:update(dt, panicSpriteDuration, self.awkward)
+  end
+
 
   if self.tween then
     self.tween:update(dt)
@@ -75,13 +98,18 @@ function Character:update(dt)
   dbg:msg("-----------------------------------", "")
   dbg:msg("character.awkward", self.awkward)
   dbg:msg("character.panic", self.panic)
+  
 end
 
 
 function Character:draw()
   local r, g, b = love.graphics.getColor()
   love.graphics.setColor(self.personality.color)
-  self.animations[self.currentAnimationKey]:draw(self.x, self.y, self.isMirrored)
+  if self:isSpecialAnimationPlaying() then
+    self.specialAnimations[self.currentSpecialAnimationKey]:draw(self.x, self.y, self.isMirrored)
+  else
+    self.animations[self.currentAnimationKey]:draw(self.x, self.y, self.isMirrored)
+  end
   love.graphics.setColor(r, g, b)
 end
 

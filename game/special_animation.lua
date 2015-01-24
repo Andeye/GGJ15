@@ -24,6 +24,12 @@ function SpecialAnimation:new(spriteSheetImage, spriteArray, scale, quadWidth, d
 end
 
 
+function SpecialAnimation:play()
+  self.currentQuadIndex = 1
+  self.currentTime = 0
+end
+
+
 function SpecialAnimation:isPlaying()
   return self.currentQuadIndex ~= nil and self.currentQuadIndex <= #self.spriteArray
 end
@@ -37,13 +43,8 @@ function SpecialAnimation:update(dt, spriteDuration, awkwardness)
 
   self.currentTime = self.currentTime + dt * 1000
 
-  self.currentFaceIndex = math.floor(awkwardness / 100 * #self.spriteArray) + 1
-  if self.currentFaceIndex > #self.spriteArray then
-    self.currentFaceIndex = #self.spriteArray
-  end
-
-  if self.currentTime > spriteDuration then
-    self.currentTime = self.currentTime - spriteDuration
+  if self.currentTime > self.duration then
+    self.currentTime = self.currentTime - self.duration
     self.currentQuadIndex = self.currentQuadIndex + 1
     if self.currentQuadIndex > #self.spriteArray then
       self.currentQuadIndex = nil
