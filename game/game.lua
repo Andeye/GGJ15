@@ -28,16 +28,17 @@ Game.__index = Game
 
 
 local nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
+local mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png")
 
 ---
 -- Temporary function for creating the test character (whitedude)
-local function createCharacter(x, y)
+local function createCharacter(x, y, spritesheetImage)
   local character = Character:new(x, y, PersonalityGenerator:createPersonality())
 
-  local walkAnimationMatrix, panicAnimationMatrix, scale = AnimationParser:parseCharacter(nakedDudeSpritesheetImage)
+  local walkAnimationMatrix, panicAnimationMatrix, scale = AnimationParser:parseCharacter(spritesheetImage)
 
-  character:addAnimation("walk", Animation:new(nakedDudeSpritesheetImage, walkAnimationMatrix, scale))
-  character:addAnimation("panic", Animation:new(nakedDudeSpritesheetImage, panicAnimationMatrix, scale))
+  character:addAnimation("walk", Animation:new(spritesheetImage, walkAnimationMatrix, scale))
+  character:addAnimation("panic", Animation:new(spritesheetImage, panicAnimationMatrix, scale))
 
   return character
 end
@@ -88,19 +89,19 @@ function Game:new()
   SoundMusic:load()
   SoundSfx:load()
 
-  local character = createCharacter(450, 300)
+  local character = createCharacter(450, 300, nakedDudeSpritesheetImage)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(550, 150)
+  character = createCharacter(550, 150, nakedDudeSpritesheetImage)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(800, 250)
+  character = createCharacter(800, 250, nakedDudeSpritesheetImage)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  self.player = createCharacter(650, 350)
+  self.player = createCharacter(650, 350, mainCharacterFrontsideSpritesheetImage)
   table.insert(self.drawables, self.player)
 
   GUI:addComponent(createButton("Dance", function() sendGlobalEvent(self, "dance") end))
@@ -129,7 +130,7 @@ function love.keypressed(key)
   elseif key == "f" then
     SoundSfx:play("fart")
   elseif key == "e" then
-    local newEvent = EventTypes:getEvent(self.player, "dance")
+    local newEvent = EventTypes:getEvent(game.player, "dance")
     for i, character in ipairs(game.characterList) do
       game.characterList[i]:event(newEvent)
     end
@@ -143,19 +144,19 @@ end
 
 local function input(dt)
   if love.keyboard.isDown("w") then
-    self.player:move(0, -100 * dt * 0.47)
+    game.player:move(0, -100 * dt * 0.47)
   end
   if love.keyboard.isDown("s") then
-    self.player:move(0, 100 * dt * 0.47)
+    game.player:move(0, 100 * dt * 0.47)
   end
   if love.keyboard.isDown("a") then
-    self.player:move(-100 * dt, 0)
+    game.player:move(-100 * dt, 0)
   end
   if love.keyboard.isDown("d") then
-    self.player:move(100 * dt, 0)
+    game.player:move(100 * dt, 0)
   end
   if love.keyboard.isDown("t") then
-    self.player:moveTo(200, -100)
+    game.player:moveTo(200, -100)
   end
   if love.keyboard.isDown("r") then
     elevator.y = 1000
