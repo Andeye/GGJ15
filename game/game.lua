@@ -23,6 +23,9 @@ Game = {
   player = nil,
   characterList = nil,
   drawables = nil,
+  buttonOffsetX = 30,
+  buttonOffsetY = 30,
+  buttonList = nil,
 }
 Game.__index = Game
 
@@ -43,6 +46,16 @@ local function createCharacter(x, y, spritesheetImage)
   return character
 end
 
+local function buttonUpdate(button, f)
+  if button.isDisabled then
+    print("disabled")
+    return
+  else
+    f()
+    button.isDisabled = true
+  end
+end
+
 
 local function sendGlobalEvent(self, type)
   print("send global event")
@@ -53,26 +66,37 @@ local function sendGlobalEvent(self, type)
 end
 
 
-local buttonOffsetX = 30
-local buttonOffsetY = 30
-local buttonList = {}
 
-local function createButton(title, eventTrigger)
-  local x = elevator.x + elevator.elevatorImage:getWidth() * elevator.scale + buttonOffsetX
+local function createButton(game, title, f)
+  local x = elevator.x + elevator.elevatorImage:getWidth() * elevator.scale + game.buttonOffsetX
 
-  local y = buttonOffsetY
-  if #buttonList > 0 then
-    y = buttonList[#buttonList].y + buttonList[#buttonList].height + buttonOffsetY
+  local y = game.buttonOffsetY
+  if #game.buttonList > 0 then
+    y = game.buttonList[#game.buttonList].y + game.buttonList[#game.buttonList].height + game.buttonOffsetY
   end
 
   local button = Button:new{
     x = x,
     y = y,
     text = title,
-    onClick = eventTrigger
+    onClick = function(button) buttonUpdate(button, f) end, -- eventTrigger,
+    accumulatedTime = 0,
+    isDisabled = false,
+    accumulate = function(self, dt)
+      if self.isDisabled then
+        self.accumulatedTime = self.accumulatedTime + dt
+        if self.accumulatedTime >= 2 then
+          self.isDisabled = false
+          print("enabled")
+          self.accumulatedTime = 0
+        end 
+      end
+    end
   }
 
-  table.insert(buttonList, button)
+  --  buttonUpdate(button, f)
+
+  table.insert(game.buttonList, button)
 
   return button
 end
@@ -104,8 +128,28 @@ function Game:new()
   self.player = createCharacter(650, 350, mainCharacterFrontsideSpritesheetImage)
   table.insert(self.drawables, self.player)
 
-  GUI:addComponent(createButton("Dance", function() sendGlobalEvent(self, "dance") end))
-  GUI:addComponent(createButton("Calm down", function() sendGlobalEvent(self, "calm_down") end))
+
+  self.buttonList = {}
+  GUI:addComponent(createButton(self, "Dance",
+    function()
+      sendGlobalEvent(self, "dance")
+    end))
+  GUI:addComponent(createButton(self, "Calm down",
+    function()
+      sendGlobalEvent(self, "calm_down")
+    end))
+  GUI:addComponent(createButton(self, "Fart",
+    function()
+      sendGlobalEvent(self, "fart")
+      SoundSfx:play("fart_male_" .. math.random(1, 3))
+    end))
+  GUI:addComponent(createButton(self, "Wave", function() sendGlobalEvent(self, "wave") end))
+  GUI:addComponent(createButton(self, "Flirt", function()
+    sendGlobalEvent(self, "flirt")
+    SoundSfx:play("kiss_female_" .. math.random(1, 2))
+  end))
+  GUI:addComponent(createButton(self, "Tell joke", function() sendGlobalEvent(self, "tell_joke") end))
+  GUI:addComponent(createButton(self, "Irritate", function() sendGlobalEvent(self, "irritate") end))
 
   return self
 end
@@ -193,6 +237,10 @@ function Game:update(dt)
   end
 
   local roomPanic, roomAwkwardness = getRoomStatus(self)
+
+  for _, button in ipairs(self.buttonList) do
+    button:accumulate(dt)
+  end
 
   dbg:msg("---------------------------", "")
   dbg:msg("roomPanic", roomPanic)
