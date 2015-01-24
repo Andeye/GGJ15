@@ -27,13 +27,6 @@ function Event:new(sender, type, panicValue, awkwardValue)
   self.panicValue = panicValue or self.panicValue
   self.awkwardValue = awkwardValue or self.awkwardValue
 
-  print("--------------------------")
-  print("event.sender       = " .. dbg:serialize(self.sender))
-  print("event.type         = " .. self.type)
-  print("event.panicValue   = " .. self.panicValue)
-  print("event.awkwardValue = " .. self.awkwardValue)
-  print("--------------------------")
-    
   return self
 end
 

@@ -37,8 +37,6 @@ function EventTypes:getEvent(sender, type)
     error("Can't use events without sender")
   end
   
-  print(tostring(type))
-  
   local eventType = EventType[type]
   
   if eventType == nil then

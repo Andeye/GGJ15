@@ -14,27 +14,25 @@ colors[11] = {161, 140, 107}
 colors[12] = {144, 96, 58}
 colors[13] = {178, 131, 83}
 
-
-
-
+local VALUE_RANGE = 4
 
 function PersonalityGenerator:createPersonality(reactToEvent)
   local personality = {
     eventTypeMap = {}
   }
-  
 
   local index = math.random(1, #colors)
   personality.color = colors[index]
 
-  local p, a = 4 * math.random() - 2, 4 * math.random() - 2
-  print(p, a)
-  personality.reactToEvent = reactToEvent or function(event)
+  personality.reactToEvent = reactToEvent or function(self, event)
 
-      local panic = p * event:getPanicValue()
-      local awkward = a * event:getAwkwardValue()
-      
-      print(panic, awkward)
+      if self.eventTypeMap[event.type] == nil then
+        local p, a = VALUE_RANGE * math.random() - VALUE_RANGE / 2, VALUE_RANGE * math.random() - VALUE_RANGE / 2
+        self.eventTypeMap[event.type] = {p = p, a = a}
+      end
+
+      local panic = self.eventTypeMap[event.type].p * event:getPanicValue()
+      local awkward = self.eventTypeMap[event.type].a * event:getAwkwardValue()
 
       return panic, awkward
   end
