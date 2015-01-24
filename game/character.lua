@@ -9,7 +9,7 @@ Character = {
 	panic = 50,
 	x = 500,
 	y = 300,
-  color = {255, 255, 255},
+  color,
 	faces = nil,
 }
 Character.__index = Character
@@ -28,7 +28,7 @@ function Character:new(x, y, color)
   }
   self.x = x or self.x
   self.y = y or self.y
-  self.color = color or self.color
+  self.color = color or {255, 255, 255}
 
   self.image = CharacterPrms.image
   self.scale = love.window:getHeight() / self.image:getHeight() / 2
