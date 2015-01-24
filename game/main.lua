@@ -36,5 +36,5 @@ function love.draw()
 	elevator:draw()
 
 	love.graphics.setColor(255, 255, 255, 255)
-	love.graphics.print("FPS: "..love.timer.getFPS(), 10, 10)
+	love.graphics.print("FPS: "..love.timer.getFPS()..dbg:out(), 10, 10)
 end
