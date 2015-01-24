@@ -31,7 +31,7 @@ Game.__index = Game
 local function createCharacter(x, y)
   local character = Character:new(x, y, PersonalityGenerator:createPersonality())
 
-  local image = love.graphics.newImage("assets/graphics/sprites/whitedude_spritesheet.png")
+  local image = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
   local quadArray, scale = AnimationParser:parse(image, 1, 4, 1)
   local timeArray = {100, 100, 100, 100}
 
