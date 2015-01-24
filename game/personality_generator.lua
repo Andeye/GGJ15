@@ -1,6 +1,5 @@
 PersonalityGenerator = {}
 
-
 local colors = {}
 colors[1] = {189, 176, 142}
 colors[2] = {173, 170, 147}
@@ -16,13 +15,30 @@ colors[12] = {144, 96, 58}
 colors[13] = {178, 131, 83}
 
 
-function PersonalityGenerator:createPersonality()
-  local personality = {}
+
+
+
+function PersonalityGenerator:createPersonality(reactToEvent)
+  local personality = {
+    eventTypeMap = {}
+  }
   
+
   local index = math.random(1, #colors)
-  print("color index = " .. index)
   personality.color = colors[index]
-  
+
+  local p, a = 4 * math.random() - 2, 4 * math.random() - 2
+  print(p, a)
+  personality.reactToEvent = reactToEvent or function(event)
+
+      local panic = p * event:getPanicValue()
+      local awkward = a * event:getAwkwardValue()
+      
+      print(panic, awkward)
+
+      return panic, awkward
+  end
+
   return personality
 end
 

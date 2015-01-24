@@ -13,6 +13,7 @@ love.filesystem.load("animation_parser.lua")()
 love.filesystem.load("sound_music.lua")()
 love.filesystem.load("sound_sfx.lua")()
 
+love.filesystem.load("event_types.lua")()
 love.filesystem.load("event.lua")()
 
 local elevator = Elevator:new()
@@ -25,16 +26,18 @@ Game = {
 }
 Game.__index = Game
 
+
+local nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
+
 ---
 -- Temporary function for creating the test character (whitedude)
 local function createCharacter(x, y)
   local character = Character:new(x, y, PersonalityGenerator:createPersonality())
 
-  local image = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
-  local walkAnimationMatrix, panicAnimationMatrix, scale = AnimationParser:parseCharacter(image)
+  local walkAnimationMatrix, panicAnimationMatrix, scale = AnimationParser:parseCharacter(nakedDudeSpritesheetImage)
 
-  character:addAnimation("walk", Animation:new(image, walkAnimationMatrix, scale))
-  character:addAnimation("panic", Animation:new(image, panicAnimationMatrix, scale))
+  character:addAnimation("walk", Animation:new(nakedDudeSpritesheetImage, walkAnimationMatrix, scale))
+  character:addAnimation("panic", Animation:new(nakedDudeSpritesheetImage, panicAnimationMatrix, scale))
 
   return character
 end
@@ -53,16 +56,16 @@ function Game:new()
   local character = createCharacter(450, 300)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
-  
-  character = createCharacter(650, 300)
+
+  character = createCharacter(550, 150)
+  table.insert(self.characterList, character)
+  table.insert(self.drawables, character)
+
+  character = createCharacter(800, 250)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
   
-  character = createCharacter(630, 350)
-  table.insert(self.characterList, character)
-  table.insert(self.drawables, character)
-  
-  player = createCharacter(550, 150)
+  player = createCharacter(650, 350)
   table.insert(self.drawables, player)
   local button = Button:new{x=800, y=200, text="Call elevator", onClick=function()
       elevator.y = 1000
@@ -95,8 +98,14 @@ function love.keypressed(key)
   elseif key == "f" then
     SoundSfx:play("fart")
   elseif key == "e" then
+    local newEvent = EventTypes:getEvent(player, "dance")
     for i, character in ipairs(game.characterList) do
-      game.characterList[i]:event(Event:new(game.characterList[1], "dance", 7, 2))
+      game.characterList[i]:event(newEvent)
+    end
+  elseif key == "r" then
+    local newEvent = EventTypes:getEvent(player, "calm_down")
+    for i, character in ipairs(game.characterList) do
+      game.characterList[i]:event(newEvent)
     end
   end
 end
@@ -152,6 +161,8 @@ function Game:update(dt)
   end
 
   local roomPanic, roomAwkwardness = getRoomStatus(self)
+  
+  dbg:msg("---------------------------", "")
   dbg:msg("roomPanic", roomPanic)
   dbg:msg("roomAwkwardness", roomAwkwardness)
 
