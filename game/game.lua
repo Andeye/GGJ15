@@ -13,6 +13,7 @@ love.filesystem.load("animation_parser.lua")()
 love.filesystem.load("sound_music.lua")()
 love.filesystem.load("sound_sfx.lua")()
 
+love.filesystem.load("event_types.lua")()
 love.filesystem.load("event.lua")()
 
 local elevator = Elevator:new()
@@ -53,15 +54,15 @@ function Game:new()
   table.insert(characterList, character)
   table.insert(drawables, character)
 
-  character = createCharacter(650, 300)
+  character = createCharacter(550, 150)
   table.insert(characterList, character)
   table.insert(drawables, character)
 
-  character = createCharacter(630, 350)
+  character = createCharacter(800, 250)
   table.insert(characterList, character)
   table.insert(drawables, character)
 
-  player = createCharacter(550, 150)
+  player = createCharacter(650, 350)
   --  table.insert(characterList, player)
   table.insert(drawables, player)
 
@@ -88,8 +89,14 @@ function love.keypressed(key)
   elseif key == "f" then
     SoundSfx:play("fart")
   elseif key == "e" then
+    local newEvent = EventTypes:getEvent(player, "dance")
     for i, character in ipairs(characterList) do
-      characterList[i]:event(Event:new(characterList[1], "dance", 7, 2))
+      characterList[i]:event(newEvent)
+    end
+  elseif key == "r" then
+    local newEvent = EventTypes:getEvent(player, "calm_down")
+    for i, character in ipairs(characterList) do
+      characterList[i]:event(newEvent)
     end
   end
 end
@@ -138,6 +145,8 @@ function Game:update(dt)
   end
 
   local roomPanic, roomAwkwardness = getRoomStatus()
+  
+  dbg:msg("---------------------------", "")
   dbg:msg("roomPanic", roomPanic)
   dbg:msg("roomAwkwardness", roomAwkwardness)
 
