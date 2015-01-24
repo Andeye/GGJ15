@@ -18,11 +18,10 @@ colors[13] = {178, 131, 83}
 
 function PersonalityGenerator:createPersonality()
   local personality = {}
-  
+
   local index = math.random(1, #colors)
-  print("color index = " .. index)
   personality.color = colors[index]
-  
+
   return personality
 end
 

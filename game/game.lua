@@ -26,16 +26,18 @@ Game = {
   }
 Game.__index = Game
 
+
+local nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
+
 ---
 -- Temporary function for creating the test character (whitedude)
 local function createCharacter(x, y)
   local character = Character:new(x, y, PersonalityGenerator:createPersonality())
 
-  local image = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
-  local walkAnimationMatrix, panicAnimationMatrix, scale = AnimationParser:parseCharacter(image)
+  local walkAnimationMatrix, panicAnimationMatrix, scale = AnimationParser:parseCharacter(nakedDudeSpritesheetImage)
 
-  character:addAnimation("walk", Animation:new(image, walkAnimationMatrix, scale))
-  character:addAnimation("panic", Animation:new(image, panicAnimationMatrix, scale))
+  character:addAnimation("walk", Animation:new(nakedDudeSpritesheetImage, walkAnimationMatrix, scale))
+  character:addAnimation("panic", Animation:new(nakedDudeSpritesheetImage, panicAnimationMatrix, scale))
 
   return character
 end
@@ -50,17 +52,17 @@ function Game:new()
   local character = createCharacter(450, 300)
   table.insert(characterList, character)
   table.insert(drawables, character)
-  
+
   character = createCharacter(650, 300)
   table.insert(characterList, character)
   table.insert(drawables, character)
-  
+
   character = createCharacter(630, 350)
   table.insert(characterList, character)
   table.insert(drawables, character)
-  
+
   player = createCharacter(550, 150)
---  table.insert(characterList, player)
+  --  table.insert(characterList, player)
   table.insert(drawables, player)
 
   return self
