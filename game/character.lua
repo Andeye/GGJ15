@@ -3,13 +3,13 @@ CharacterPrms = {
 }
 
 Character = {
-  animations = {},
+  animations = nil,
   currentAnimationKey = nil,
   awkward = 50,
   panic = 50,
   x = 500,
   y = 300,
-  faces = {},
+  faces = nil,
 }
 Character.__index = Character
 
@@ -17,6 +17,7 @@ Character.__index = Character
 function Character:new(x, y)
   local self = setmetatable({}, Character)
 
+  self.animations = {}
   self.faces = {
     quadArray = {},
     index = 1,

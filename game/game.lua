@@ -29,7 +29,7 @@ local function createCharacter(x, y)
 
   local image = love.graphics.newImage("assets/graphics/sprites/whitedude_spritesheet.png")
   local quadArray, scale = AnimationParser:parse(image, 1, 4, 1)
-  local timeArray = {100, 100, 4000000, 100}
+  local timeArray = {100, 100, 100, 100}
 
   character:addAnimation("test", Animation:new(image, quadArray, timeArray, scale))
 
@@ -111,6 +111,7 @@ end
 
 
 function Game:update(dt)
+
   dbg:msg("Game ID", tostring(self.selected))
 
   input(dt)
