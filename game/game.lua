@@ -8,6 +8,7 @@ love.filesystem.load("personality_generator.lua")()
 love.filesystem.load("character.lua")()
 love.filesystem.load("elevator.lua")()
 love.filesystem.load("animation.lua")()
+love.filesystem.load("special_animation.lua")()
 love.filesystem.load("animation_parser.lua")()
 
 love.filesystem.load("sound_music.lua")()
@@ -29,6 +30,7 @@ Game.__index = Game
 
 local nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
 local mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png")
+local mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png")
 
 ---
 -- Temporary function for creating the test character (whitedude)
@@ -68,6 +70,19 @@ local function createButton(title, eventTrigger)
 end
 
 
+function addSpecialSpriteSheets(player)
+  local totalRows = 2
+  local quads = 10
+  local specialAnimations = {}
+  local scale = nil
+  for i = 1, totalRows do
+    specialAnimations[i], scale = AnimationParser:parseSpecialSpritesheet(mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
+  end
+  player:addSpecialAnimation("handwave", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[1], quads, 1))
+--  player:addSpecialAnimation("calm_down", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[2], quads, 1))
+end
+
+
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
@@ -92,6 +107,7 @@ function Game:new()
   table.insert(self.drawables, character)
   
   self.player = createCharacter(650, 350, mainCharacterFrontsideSpritesheetImage)
+  addSpecialSpriteSheets(self.player)
   table.insert(self.drawables, self.player)
 
   GUI:addComponent(createButton("Dance", function()

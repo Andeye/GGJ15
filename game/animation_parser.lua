@@ -49,4 +49,20 @@ function AnimationParser:parseCharacter(image)
 end
 
 
+function AnimationParser:parseSpecialSpritesheet(image, row, quads, totalRows)
+  local quadWidth = image:getWidth() / quads
+  local quadHeight = image:getHeight() / totalRows
+
+  local scale = love.window:getHeight() / quadHeight / 2
+  
+  local animationArray = {}
+  
+  for k = 1, quads do
+    animationArray[k] = love.graphics.newQuad((k-1) * quadWidth, (row-1) * quadHeight, quadWidth, quadHeight, image:getDimensions())
+  end
+  
+  return animationArray, scale, quadWidth
+end
+
+
 return AnimationParser

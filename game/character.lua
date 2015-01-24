@@ -2,7 +2,9 @@ CharacterPrms = {}
 
 Character = {
   animations = nil,
+  specialAnimations = nil,
   currentAnimationKey = nil,
+  currentSpecialAnimationKey = nil,
   awkward = 50,
   panic = 50,
   x = 500,
@@ -17,6 +19,7 @@ function Character:new(x, y, personality)
   local self = setmetatable({}, Character)
 
   self.animations = {}
+  self.specialAnimations = {}
   self.x = x or self.x
   self.y = y or self.y
   self.personality = personality
@@ -78,7 +81,7 @@ end
 function Character:draw()
   local r, g, b = love.graphics.getColor()
   love.graphics.setColor(self.personality.color)
-  self.animations[self.currentAnimationKey]:draw(self.x, self.y)
+  self.animations[self.currentAnimationKey]:draw(self.x, self.y, self.isMirrored)
   love.graphics.setColor(r, g, b)
 end
 
@@ -87,6 +90,14 @@ function Character:addAnimation(key, animation)
   self.animations[key] = animation
   if self.currentAnimationKey == nil then
     self.currentAnimationKey = key
+  end
+end
+
+
+function Character:addSpecialAnimation(key, animation)
+  self.specialAnimations[key] = animation
+  if self.currentSpecialAnimationKey == nil then
+    self.currentSpecialAnimationKey = key
   end
 end
 
@@ -118,7 +129,5 @@ function Character:getY()
 end
 
 function Character:mirror()
-  for _, animation in pairs(self.animations) do
-    animation:mirror()
-  end
+  self.isMirrored = not self.isMirrored
 end
