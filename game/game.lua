@@ -32,14 +32,14 @@ local function createCharacter(x, y)
   local character = Character:new(x, y, PersonalityGenerator:createPersonality())
 
   local image = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
-  local quadArray, scale = AnimationParser:parse(image, 1, 4, 1)
-  local timeArray = {100, 100, 100, 100}
+  local quadArray, scale = AnimationParser:parse(image, 4, 9, 1)
+  local timeArray = {100, 100, 100, 100, 100, 100, 100, 100, 100}
 
   character:addAnimation("test", Animation:new(image, quadArray, timeArray, scale))
 
-  local faceImage = love.graphics.newImage("assets/graphics/faces/face-test.png")
-  local faceQuadArray = AnimationParser:parse(faceImage, 1, 5, 1)
-  character:setFaces(faceImage, faceQuadArray, 88, 48)
+--  local faceImage = love.graphics.newImage("assets/graphics/faces/face-test.png")
+--  local faceQuadArray = AnimationParser:parse(faceImage, 1, 5, 1)
+--  character:setFaces(faceImage, faceQuadArray, 88, 48)
 
   return character
 end
