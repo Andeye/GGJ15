@@ -1,6 +1,3 @@
 [submodule "game/external/livecode"]
 	path = game/external/livecode
 	url = git@github.com:ChrisJan00/livecode_love.git
-[submodule "game/external/tween"]
-	path = game/external/tween
-	url = git@github.com:kikito/tween.lua.git
