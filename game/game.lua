@@ -17,13 +17,12 @@ love.filesystem.load("event.lua")()
 
 local elevator = Elevator:new()
 
-local player
-local characterList = {}
-local drawables = {}
-table.insert(drawables, elevator)
 
 Game = {
-  }
+  player,
+  characterList,
+  drawables,
+}
 Game.__index = Game
 
 ---
@@ -44,24 +43,27 @@ function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
 
+  self.characterList = {}
+  self.drawables = {}
+  table.insert(self.drawables, elevator)
+
   SoundMusic:load()
   SoundSfx:load()
 
   local character = createCharacter(450, 300)
-  table.insert(characterList, character)
-  table.insert(drawables, character)
+  table.insert(self.characterList, character)
+  table.insert(self.drawables, character)
   
   character = createCharacter(650, 300)
-  table.insert(characterList, character)
-  table.insert(drawables, character)
+  table.insert(self.characterList, character)
+  table.insert(self.drawables, character)
   
   character = createCharacter(630, 350)
-  table.insert(characterList, character)
-  table.insert(drawables, character)
+  table.insert(self.characterList, character)
+  table.insert(self.drawables, character)
   
   player = createCharacter(550, 150)
---  table.insert(characterList, player)
-  table.insert(drawables, player)
+  table.insert(self.drawables, player)
   local button = Button:new{x=800, y=200, text="Call elevator", onClick=function()
       elevator.y = 1000
       elevator:moveTo(0)
@@ -79,22 +81,22 @@ function love.keypressed(key)
   elseif key == "right" then
     elevator:closeDoors()
   elseif key == "1" then
-    characterList[1]:addAwkwardness(-5)
-    characterList[2]:addAwkwardness(-2.5)
-    characterList[3]:addAwkwardness(-7.5)
+    game.characterList[1]:addAwkwardness(-5)
+    game.characterList[2]:addAwkwardness(-2.5)
+    game.characterList[3]:addAwkwardness(-7.5)
   elseif key == "2" then
-    characterList[1]:addAwkwardness(5)
-    characterList[2]:addAwkwardness(2.5)
-    characterList[3]:addAwkwardness(7.5)
+    game.characterList[1]:addAwkwardness(5)
+    game.characterList[2]:addAwkwardness(2.5)
+    game.characterList[3]:addAwkwardness(7.5)
   elseif key == "3" then
-    characterList[1]:addPanic(-5)
+    game.characterList[1]:addPanic(-5)
   elseif key == "4" then
-    characterList[1]:addPanic(5)
+    game.characterList[1]:addPanic(5)
   elseif key == "f" then
     SoundSfx:play("fart")
   elseif key == "e" then
-    for i, character in ipairs(characterList) do
-      characterList[i]:event(Event:new(characterList[1], "dance", 7, 2))
+    for i, character in ipairs(game.characterList) do
+      game.characterList[i]:event(Event:new(game.characterList[1], "dance", 7, 2))
     end
   end
 end
@@ -124,10 +126,10 @@ local function input(dt)
   end
 end
 
-local function getRoomStatus()
+local function getRoomStatus(game)
   local roomPanic, roomAwkwardness, counter = 0, 0, 0
 
-  for _, character in ipairs(characterList) do
+  for _, character in ipairs(game.characterList) do
     roomPanic = roomPanic + character:getPanic()
     roomAwkwardness = roomAwkwardness + character:getAwkward()
     counter = counter + 1
@@ -145,11 +147,11 @@ function Game:update(dt)
   player:update(dt)
 
   elevator:update(dt)
-  for _, character in ipairs(characterList) do
+  for _, character in ipairs(self.characterList) do
     character:update(dt)
   end
 
-  local roomPanic, roomAwkwardness = getRoomStatus()
+  local roomPanic, roomAwkwardness = getRoomStatus(self)
   dbg:msg("roomPanic", roomPanic)
   dbg:msg("roomAwkwardness", roomAwkwardness)
 
@@ -157,8 +159,8 @@ function Game:update(dt)
 end
 
 function Game:draw()
-  table.sort(drawables, sortY)
-  for k,v in ipairs(drawables) do
+  table.sort(self.drawables, sortY)
+  for k,v in ipairs(self.drawables) do
     v:draw()
   end
 end
