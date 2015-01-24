@@ -8,27 +8,26 @@ love.filesystem.load("gui.lua")()
 love.filesystem.load("game.lua")()
 
 function love.livereload()
-	love.load()
+  love.load()
 end
 
 function love.load()
-	GameState:new()
-	GUI:new()
-	game = Game:new()
-	GameState:add("game", game)
-	GameState:push("game")
-	print(dbg:serialize(game))
+  GameState:new()
+  GUI:new()
+  game = Game:new()
+  GameState:add("game", game)
+  GameState:push("game")
 end
 
 function love.update(dt)
-	GameState:update(dt)
-	GUI:update(dt)
+  GameState:update(dt)
+  GUI:update(dt)
 end
 
 function love.draw()
-	GameState:draw()
-	GUI:draw()
-	
-	love.graphics.setColor(255, 255, 255, 255)
-	love.graphics.print("FPS: "..love.timer.getFPS()..dbg:out(), 10, 10)
+  GameState:draw()
+  GUI:draw()
+
+  love.graphics.setColor(255, 255, 255, 255)
+  love.graphics.print("FPS: "..love.timer.getFPS()..dbg:out(), 10, 10)
 end

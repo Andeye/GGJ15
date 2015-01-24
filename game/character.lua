@@ -1,30 +1,44 @@
 CharacterPrms = {
   image = love.graphics.newImage("assets/graphics/gubbskelett.png"),
-	size = 25,
 }
 
 Character = {
+  animations = {},
+  currentAnimationKey = nil,
 	awkard = 50,
 	panic = 50,
+	x = 500,
+	y = 300,
 }
 Character.__index = Character
 
 
-function Character:new()
-	local self = setmetatable({}, Character)
-	self.hover = false
+function Character:new(o)
+  local self = setmetatable(o or {}, Character)
+
 	self.image = CharacterPrms.image
 	self.scale = love.window:getHeight() / self.image:getHeight() / 2
+	
 	return self
 end
 
 
 function Character:update(dt)
+  self.animations[self.currentAnimationKey]:update(dt)
 end
 
 
 function Character:draw()
-  love.graphics.draw(self.image, (love.window:getWidth() - self.image:getWidth()*self.scale) / 2, 200, 0, self.scale)
+  self.animations[self.currentAnimationKey]:draw(self.x, self.y)
+--  love.graphics.draw(self.image, (love.window:getWidth() - self.image:getWidth()*self.scale) / 2, 200, 0, self.scale)
+end
+
+
+function Character:addAnimation(key, animation)
+  self.animations[key] = animation
+  if self.currentAnimationKey == nil then
+    self.currentAnimationKey = key
+  end
 end
 
 
