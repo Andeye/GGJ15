@@ -4,8 +4,8 @@ ElevatorPrms = {
   elevatorImage = love.graphics.newImage("assets/graphics/elevator/elevator.png"),
   leftImage = love.graphics.newImage("assets/graphics/elevator/leftdoor.png"),
   rightImage = love.graphics.newImage("assets/graphics/elevator/rightdoor.png"),
-  backGroundBarsImage = love.graphics.newImage("assets/graphics/elevator/backgroundbars.png"),
-  shaftImage = love.graphics.newImage("assets/graphics/elevator/shaft.png"),
+  -- backGroundBarsImage = love.graphics.newImage("assets/graphics/elevator/backgroundbars.png"),
+  -- shaftImage = love.graphics.newImage("assets/graphics/elevator/shaft.png"),
   x = 0,
   y = 0,
   tween,
@@ -37,9 +37,10 @@ function Elevator:new(o)
   self.scale = love.window:getHeight() / self.elevatorImage:getHeight()
   self.leftImage = ElevatorPrms.leftImage
   self.rightImage = ElevatorPrms.rightImage
-  self.backGroundBarsImage = ElevatorPrms.backGroundBarsImage
-  self.shaftImage = ElevatorPrms.shaftImage
-  self.x = (love.window:getWidth() - self.elevatorImage:getWidth() * self.scale) / 2
+  -- self.backGroundBarsImage = ElevatorPrms.backGroundBarsImage
+  -- self.shaftImage = ElevatorPrms.shaftImage
+  -- self.x = (love.window:getWidth() - self.elevatorImage:getWidth() * self.scale) / 2
+  self.x = ElevatorPrms.x
   self.y = ElevatorPrms.y
 
   return self
@@ -94,19 +95,22 @@ function Elevator:update(dt)
 
   if self.tween then
     self.tween:update(dt)
-  end 
+  end
 end
 
 
-function Elevator:draw()
-  love.graphics.draw(self.shaftImage, self.x, self.y, 0, self.scale)
-  love.graphics.draw(self.rightImage, self.x + self.doorOffset, self.y - .6*self.doorOffset, 0, self.scale)
-  love.graphics.draw(self.leftImage, self.x - self.doorOffset, self.y + .6*self.doorOffset, 0, self.scale)
-  love.graphics.draw(self.backGroundBarsImage, self.x, self.y, 0, self.scale)
-  love.graphics.draw(self.elevatorImage, self.x, self.y, 0, self.scale)
---  love.graphics.draw(ElevatorPrms.elevatorForground, self.x, self.y, 0, self.scale)
+local function draw(self)
+  love.graphics.draw(self.image, self.x, self:getY(), 0, self.scale)
 end
 
-function Elevator:getY()
-	return self.y
+function Elevator:getDrawables()
+  return {
+    -- {draw=draw, getY=getY, image=self.shaftImage, x=self.x, getY=function() return self.y end, 0, scale=self.scale},
+    -- {draw=draw, getY=getY, image=self.backGroundBarsImage, x=self.x, getY=function() return self.y end, 0, scale=self.scale},
+    {draw=draw, getY=function() return self.y end, image=self.rightImage, x=self.x + self.doorOffset, getZ=function() return self.y - .6*self.doorOffset + 1001 end, 0, scale=self.scale},
+    {draw=draw, getY=function() return self.y end, image=self.leftImage, x=self.x - self.doorOffset, getZ=function() return self.y + .6*self.doorOffset + 1002 end, 0, scale=self.scale},
+    {draw=draw, getY=function() return self.y end, image=self.elevatorImage, x=self.x, getZ=function() return self.y + 1003 end, 0, scale=self.scale},
+    --[[
+    --]]
+  }
 end

@@ -16,7 +16,14 @@ love.filesystem.load("sound_sfx.lua")()
 love.filesystem.load("event_types.lua")()
 love.filesystem.load("event.lua")()
 
+love.filesystem.load("aula.lua")()
+love.filesystem.load("shaft.lua")()
+
 local elevator = Elevator:new()
+local aula = Aula:new()
+local shaft = Shaft:new()
+aula.scale = elevator.scale
+shaft.scale = elevator.scale
 
 
 Game = {
@@ -48,24 +55,28 @@ function Game:new()
 
   self.characterList = {}
   self.drawables = {}
-  table.insert(self.drawables, elevator)
+  table.insert(self.drawables, aula)
+  table.insert(self.drawables, shaft)
+  for k,v in pairs(elevator:getDrawables()) do
+    table.insert(self.drawables, v)
+  end
 
   SoundMusic:load()
   SoundSfx:load()
 
-  local character = createCharacter(450, 300)
+  local character = createCharacter(200, 300)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(550, 150)
+  character = createCharacter(300, 150)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(800, 250)
+  character = createCharacter(550, 250)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
   
-  player = createCharacter(650, 350)
+  player = createCharacter(400, 350)
   table.insert(self.drawables, player)
   local button = Button:new{x=800, y=200, text="Call elevator", onClick=function()
       elevator.y = 1000
@@ -170,12 +181,21 @@ function Game:update(dt)
 end
 
 function Game:draw()
-  table.sort(self.drawables, sortY)
+  --[[
+  for k,v in pairs(elevator:getDrawables()) do
+    table.insert(self.drawables, v)
+  end
+  --]]
+  table.sort(self.drawables, sortZ)
   for k,v in ipairs(self.drawables) do
     v:draw()
   end
 end
 
-function sortY(a, b)
-  return a:getY() < b:getY()
+function sortZ(a, b)
+  -- print("a")
+  -- print(dbg:serialize(a))
+  -- print("b")
+  -- print(dbg:serialize(b))
+  return a:getZ() < b:getZ()
 end

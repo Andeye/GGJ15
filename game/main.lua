@@ -1,5 +1,5 @@
 
-require("external/livecode/livecode")
+-- require("external/livecode/livecode")
 tween = require("external/tween/tween")
 
 love.filesystem.load("dbg.lua")()

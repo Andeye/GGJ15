@@ -112,6 +112,6 @@ function Character:event(o)
   self:addPanic(p)
 end
 
-function Character:getY()
+function Character:getZ()
   return self.y
 end
