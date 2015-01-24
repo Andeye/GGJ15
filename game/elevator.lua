@@ -1,4 +1,5 @@
 ElevatorPrms = {
+  elevatorForground = love.graphics.newImage("assets/graphics/elevator/placeholder-fix.png"),
   elevatorImage = love.graphics.newImage("assets/graphics/elevator/elevator-nodoor.png"),
   leftImage = love.graphics.newImage("assets/graphics/elevator/left-door.png"),
   rightImage = love.graphics.newImage("assets/graphics/elevator/right-door.png"),
@@ -8,6 +9,7 @@ ElevatorPrms = {
 
 local MAX_DOOR_OFFSET = 120
 local MIN_DOOR_OFFSET = 0
+local DOOR_OFFSET_TIME_FACTOR = 60
 
 local DOOR_STATES = {
   OPENING = 1,
@@ -39,7 +41,7 @@ end
 
 
 local function updateOpenDoors(self, dt)
-  self.doorOffset = self.doorOffset + dt * 50
+  self.doorOffset = self.doorOffset + dt * DOOR_OFFSET_TIME_FACTOR
   if self.doorOffset >= MAX_DOOR_OFFSET then
     self.doorOffset = MAX_DOOR_OFFSET
     self.currentDoorState = DOOR_STATES.OPEN
@@ -48,7 +50,7 @@ end
 
 
 local function updateCloseDoors(self, dt)
-  self.doorOffset = self.doorOffset - dt * 50
+  self.doorOffset = self.doorOffset - dt * DOOR_OFFSET_TIME_FACTOR
   if self.doorOffset <= MIN_DOOR_OFFSET then
     self.doorOffset = MIN_DOOR_OFFSET
     self.currentDoorState = DOOR_STATES.CLOSED
@@ -79,7 +81,8 @@ end
 
 
 function Elevator:draw()
-  love.graphics.draw(self.leftImage, self.x - self.doorOffset, self.y + 0.5 * self.doorOffset, 0, self.scale)
-  love.graphics.draw(self.rightImage, self.x + self.doorOffset, self.y - 0.5 * self.doorOffset, 0, self.scale)
+  love.graphics.draw(self.leftImage, self.x - self.doorOffset, self.y + 0.47 * self.doorOffset, 0, self.scale)
+  love.graphics.draw(self.rightImage, self.x + self.doorOffset, self.y - 0.47 * self.doorOffset, 0, self.scale)
   love.graphics.draw(self.elevatorImage, self.x, self.y, 0, self.scale)
+  love.graphics.draw(ElevatorPrms.elevatorForground, self.x, self.y, 0, self.scale)
 end
