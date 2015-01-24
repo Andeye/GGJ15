@@ -63,6 +63,13 @@ function getPanicSpriteDuration(panic)
 end
 
 
+function Character:playAnimation(key)
+  if self.animations[key] ~= nil then
+    self.currentAnimationKey = key
+  end
+end
+
+
 function Character:isSpecialAnimationPlaying()
   local key = self.currentSpecialAnimationKey
   return key ~= nil and self.specialAnimations[key]:isPlaying()

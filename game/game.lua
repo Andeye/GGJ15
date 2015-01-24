@@ -71,7 +71,10 @@ end
 
 
 function addSpecialSpriteSheets(player)
-  local totalRows = 2
+  
+  -- add the special animations
+  
+  local totalRows = 3
   local quads = 10
   local specialAnimations = {}
   local scale = nil
@@ -81,6 +84,13 @@ function addSpecialSpriteSheets(player)
   end
   player:addSpecialAnimation("handwave", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[1], scale, quadWidth, 100))
   player:addSpecialAnimation("calm_down", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[2], scale, quadWidth, 100))
+  player:addSpecialAnimation("fart", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[3], scale, quadWidth, 300))
+  
+  -- add the idle "animation"
+  local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
+  player:addAnimation("idle", Animation:new(mainCharacterSpecialSpritesheetImage_1, idleAnimationMatrix, scale, quadWidth))
+  player:playAnimation("idle")
+  
 end
 
 
@@ -95,6 +105,9 @@ function Game:new()
   SoundMusic:load()
   SoundSfx:load()
 
+  --[[
+  -- create the characters
+  --]]
   local character = createCharacter(450, 300, nakedDudeSpritesheetImage)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
@@ -107,9 +120,17 @@ function Game:new()
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
   
+  --[[
+  -- Create the player
+  --]]
+  
   self.player = createCharacter(650, 350, mainCharacterFrontsideSpritesheetImage)
   addSpecialSpriteSheets(self.player)
   table.insert(self.drawables, self.player)
+  
+  --[[
+  -- Create buttons
+  --]]
 
   GUI:addComponent(createButton("Dance", function()
     local newEvent = EventTypes:getEvent(self.player, "dance")
@@ -144,6 +165,8 @@ function love.keypressed(key)
     game.characterList[1]:addPanic(-5)
   elseif key == "4" then
     game.characterList[1]:addPanic(5)
+  elseif key == "8" then
+    game.player:playSpecialAnimation("fart")
   elseif key == "9" then
     game.player:playSpecialAnimation("handwave")
   elseif key == "0" then
