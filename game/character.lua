@@ -11,6 +11,7 @@ Character = {
 	y = 300,
   color,
 	faces = nil,
+  tween,
 }
 Character.__index = Character
 
@@ -42,6 +43,10 @@ function Character:move(dx, dy)
   self.y = self.y + dy
 end
 
+function Character:moveTo(x, y)
+  self.tween = tween.new(3, self, {x=x, y=y})
+end
+
 function Character:addAwkwardness(da)
   self.awkward = self.awkward + da
   if self.awkward >= 100 then
@@ -67,6 +72,10 @@ function Character:update(dt)
   self.faces.index = math.floor(self.awkward / 100 * (#self.faces.quadArray - 1)) + 2
   if self.faces.index > #self.faces.quadArray then
     self.faces.index = #self.faces.quadArray
+  end
+  
+  if self.tween then
+    self.tween:update(dt)
   end
 
   dbg:msg("faceIndex", self.faces.index)
