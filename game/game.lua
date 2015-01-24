@@ -32,10 +32,10 @@ local function createCharacter(x, y)
   local character = Character:new(x, y, PersonalityGenerator:createPersonality())
 
   local image = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
-  local quadArray, scale = AnimationParser:parse(image, 4, 9, 1)
-  local timeArray = {100, 100, 100, 100, 100, 100, 100, 100, 100}
+  local walkAnimationMatrix, panicAnimationMatrix, scale = AnimationParser:parseCharacter(image)
 
-  character:addAnimation("test", Animation:new(image, quadArray, timeArray, scale))
+  character:addAnimation("walk", Animation:new(image, walkAnimationMatrix, scale))
+  character:addAnimation("panic", Animation:new(image, panicAnimationMatrix, scale))
 
   return character
 end
@@ -60,7 +60,7 @@ function Game:new()
   table.insert(drawables, character)
   
   player = createCharacter(550, 150)
-  table.insert(characterList, player)
+--  table.insert(characterList, player)
   table.insert(drawables, player)
 
   return self

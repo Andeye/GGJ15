@@ -20,6 +20,7 @@ function Character:new(x, y, personality)
   self.x = x or self.x
   self.y = y or self.y
   self.personality = personality
+  self.currentAnimationKey = "panic"
 
   return self
 end
@@ -52,9 +53,16 @@ function Character:addPanic(dp)
   end
 end
 
+---
+-- http://www.wolframalpha.com/input/?i=plot%28.1975+*+x%5E2+-+39.55+*+x%2B+2000%2C+from+0+to+100%29
+function getPanicSpriteDuration(panic)
+  return .1975 * panic^2 - 39.55 * panic + 2000
+end
+
 
 function Character:update(dt)
-  self.animations[self.currentAnimationKey]:update(dt)
+  local panicSpriteDuration = getPanicSpriteDuration(self.panic)
+  self.animations[self.currentAnimationKey]:update(dt, panicSpriteDuration, self.awkward)
 
   if self.tween then
     self.tween:update(dt)
