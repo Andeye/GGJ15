@@ -5,17 +5,17 @@ CharacterPrms = {
 Character = {
   animations = nil,
   currentAnimationKey = nil,
-	awkward = 50,
-	panic = 50,
-	x = 500,
-	y = 300,
-  color = {255, 255, 255},
-	faces = nil,
+  awkward = 50,
+  panic = 50,
+  x = 500,
+  y = 300,
+  faces = nil,
+  personality = nil,
 }
 Character.__index = Character
 
 
-function Character:new(x, y, color)
+function Character:new(x, y, personality)
   local self = setmetatable({}, Character)
 
   self.animations = {}
@@ -28,7 +28,7 @@ function Character:new(x, y, color)
   }
   self.x = x or self.x
   self.y = y or self.y
-  self.color = color or self.color
+  self.personality = personality
 
   self.image = CharacterPrms.image
   self.scale = love.window:getHeight() / self.image:getHeight() / 2
@@ -77,7 +77,7 @@ end
 
 function Character:draw()
   local r, g, b = love.graphics.getColor()
-  love.graphics.setColor(self.color)
+  love.graphics.setColor(self.personality.color)
   self.animations[self.currentAnimationKey]:draw(self.x, self.y)
   love.graphics.draw(self.faces.image, self.faces.quadArray[self.faces.index], self.x + self.faces.offsetX, self.y + self.faces.offsetY, 0, 0.12)
   --  love.graphics.draw(self.image, (love.window:getWidth() - self.image:getWidth()*self.scale) / 2, 200, 0, self.scale)
@@ -112,15 +112,16 @@ function Character:getAwkward()
 end
 
 
+
 function Character:event(o)
-  if o.type == "awkward" then
-  --
-  elseif o.name == "dance" then
-  --
-  else
-    self.awkard = self.awkward + o.awkward
-    self.panic = self.panic + o.panic
+  if o.sender == self then
+    return
   end
+
+  local p, a = self.personality.reactToEvent(o)
+
+  self:addAwkwardness(a)
+  self:addPanic(p)
 end
 
 function Character:getY()
