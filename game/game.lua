@@ -20,7 +20,8 @@ local elevator = Elevator:new()
 
 
 Game = {
-  gameDuration = 6 + (4 * math.random() - 2), -- 4 - 8 minutes of gameplay
+  GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
+  accumulatedGameTime = 0,
   player = nil,
   characterList = nil,
   drawables = nil,
@@ -243,27 +244,35 @@ end
 function Game:update(dt)
 
   dbg:msg("Game ID", tostring(self.selected))
+  dbg:msg("Game time", self.accumulatedGameTime)
+  dbg:msg("Game Ends", self.GAME_DURATION)
 
-  input(dt)
+  self.accumulatedGameTime = self.accumulatedGameTime + dt
 
-  self.player:update(dt)
+  if self.accumulatedGameTime < self.GAME_DURATION then
+    input(dt)
 
-  elevator:update(dt)
-  for _, character in ipairs(self.characterList) do
-    character:update(dt)
+    self.player:update(dt)
+
+    elevator:update(dt)
+    for _, character in ipairs(self.characterList) do
+      character:update(dt)
+    end
+
+    local roomPanic, roomAwkwardness = getRoomStatus(self)
+
+    for _, button in ipairs(self.buttonList) do
+      button:accumulate(dt)
+    end
+
+    dbg:msg("---------------------------", "")
+    dbg:msg("roomPanic", roomPanic)
+    dbg:msg("roomAwkwardness", roomAwkwardness)
+
+    SoundMusic:update(dt, roomPanic, roomAwkwardness)
+  else
+  -- Do END GAME STUFF/Logic
   end
-
-  local roomPanic, roomAwkwardness = getRoomStatus(self)
-
-  for _, button in ipairs(self.buttonList) do
-    button:accumulate(dt)
-  end
-
-  dbg:msg("---------------------------", "")
-  dbg:msg("roomPanic", roomPanic)
-  dbg:msg("roomAwkwardness", roomAwkwardness)
-
-  SoundMusic:update(dt, roomPanic, roomAwkwardness)
 end
 
 function Game:draw()
