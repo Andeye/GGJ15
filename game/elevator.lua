@@ -1,6 +1,7 @@
 ElevatorPrms = {
   elevatorForground = love.graphics.newImage("assets/graphics/elevator/placeholder-fix.png"),
-  elevatorImage = love.graphics.newImage("assets/graphics/elevator/elevator-nodoor.png"),
+--  elevatorImage = love.graphics.newImage("assets/graphics/elevator/elevator-nodoor.png"),
+  elevatorImage = love.graphics.newImage("assets/graphics/elevator/elevator.png"),
   leftImage = love.graphics.newImage("assets/graphics/elevator/left-door.png"),
   rightImage = love.graphics.newImage("assets/graphics/elevator/right-door.png"),
   x = 0,
@@ -54,11 +55,17 @@ local function updateCloseDoors(self, dt)
   if self.doorOffset <= MIN_DOOR_OFFSET then
     self.doorOffset = MIN_DOOR_OFFSET
     self.currentDoorState = DOOR_STATES.CLOSED
+
+    SoundMusic.isPlayMusic = true
+--    SoundMusic:setVolume(0.2)
   end
 end
 
 
 function Elevator:openDoors()
+  if self.currentDoorState == DOOR_STATES.CLOSED then
+    Sounds:playSfx("ding")
+  end
   self.currentDoorState = DOOR_STATES.OPENING
 end
 
@@ -84,5 +91,5 @@ function Elevator:draw()
   love.graphics.draw(self.leftImage, self.x - self.doorOffset, self.y + 0.47 * self.doorOffset, 0, self.scale)
   love.graphics.draw(self.rightImage, self.x + self.doorOffset, self.y - 0.47 * self.doorOffset, 0, self.scale)
   love.graphics.draw(self.elevatorImage, self.x, self.y, 0, self.scale)
-  love.graphics.draw(ElevatorPrms.elevatorForground, self.x, self.y, 0, self.scale)
+--  love.graphics.draw(ElevatorPrms.elevatorForground, self.x, self.y, 0, self.scale)
 end
