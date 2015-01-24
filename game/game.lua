@@ -43,6 +43,31 @@ local function createCharacter(x, y)
   return character
 end
 
+local buttonOffsetX = 30
+local buttonOffsetY = 30
+local buttonList = {}
+
+local function createButton(title, eventTrigger)
+  local x = elevator.x + elevator.elevatorImage:getWidth() * elevator.scale + buttonOffsetX
+  
+  local y = buttonOffsetY
+  if #buttonList > 0 then
+    y = buttonList[#buttonList].y + buttonList[#buttonList].height + buttonOffsetY
+  end
+  
+  local button = Button:new{
+    x = x,
+    y = y,
+    text = title,
+    onClick = eventTrigger
+  }
+
+  table.insert(buttonList, button)
+
+  return button
+end
+
+
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
@@ -65,13 +90,19 @@ function Game:new()
   player = createCharacter(650, 350)
   --  table.insert(characterList, player)
   table.insert(drawables, player)
-  local button = Button:new{x=800, y=200, text="Call elevator", onClick=function()
-      elevator.y = 1000
-      elevator:moveTo(0)
-    end}
-  GUI:addComponent(button)
-  button = Button:new{x=800, y=300, text="Send elevator", onClick=function() elevator:moveTo(-1000) end}
-  GUI:addComponent(button)
+
+  GUI:addComponent(createButton("Dance", function()
+    local newEvent = EventTypes:getEvent(player, "dance")
+    for i, character in ipairs(characterList) do
+      characterList[i]:event(newEvent)
+    end
+  end))
+  GUI:addComponent(createButton("Calm down", function()
+    local newEvent = EventTypes:getEvent(player, "calm_down")
+    for i, character in ipairs(characterList) do
+      characterList[i]:event(newEvent)
+    end
+  end))
 
   return self
 end
@@ -159,7 +190,7 @@ function Game:update(dt)
   end
 
   local roomPanic, roomAwkwardness = getRoomStatus()
-  
+
   dbg:msg("---------------------------", "")
   dbg:msg("roomPanic", roomPanic)
   dbg:msg("roomAwkwardness", roomAwkwardness)
