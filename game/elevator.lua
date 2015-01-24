@@ -5,6 +5,7 @@ ElevatorPrms = {
   leftImage = love.graphics.newImage("assets/graphics/elevator/leftdoor.png"),
   rightImage = love.graphics.newImage("assets/graphics/elevator/rightdoor.png"),
   backGroundBarsImage = love.graphics.newImage("assets/graphics/elevator/backgroundbars.png"),
+  shaftImage = love.graphics.newImage("assets/graphics/elevator/shaft.png"),
   x = 0,
   y = 0,
 }
@@ -36,6 +37,7 @@ function Elevator:new(o)
   self.leftImage = ElevatorPrms.leftImage
   self.rightImage = ElevatorPrms.rightImage
   self.backGroundBarsImage = ElevatorPrms.backGroundBarsImage
+  self.shaftImage = ElevatorPrms.shaftImage
   self.x = (love.window:getWidth() - self.elevatorImage:getWidth() * self.scale) / 2
   self.y = ElevatorPrms.y
 
@@ -90,6 +92,7 @@ end
 
 
 function Elevator:draw()
+  love.graphics.draw(self.shaftImage, self.x, self.y, 0, self.scale)
   love.graphics.draw(self.rightImage, self.x + self.doorOffset, self.y - .6*self.doorOffset, 0, self.scale)
   love.graphics.draw(self.leftImage, self.x - self.doorOffset, self.y + .6*self.doorOffset, 0, self.scale)
   love.graphics.draw(self.backGroundBarsImage, self.x, self.y, 0, self.scale)
