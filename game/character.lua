@@ -23,6 +23,11 @@ function Character:new(o)
 end
 
 
+function Character:move(dx, dy)
+  self.x = self.x + dx
+  self.y = self.y + dy
+end
+
 function Character:update(dt)
   self.animations[self.currentAnimationKey]:update(dt)
 end
