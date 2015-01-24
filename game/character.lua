@@ -61,6 +61,7 @@ end
 
 
 function Character:update(dt)
+
   local panicSpriteDuration = getPanicSpriteDuration(self.panic)
   self.animations[self.currentAnimationKey]:update(dt, panicSpriteDuration, self.awkward)
 
@@ -114,4 +115,10 @@ end
 
 function Character:getY()
   return self.y
+end
+
+function Character:mirror()
+  for _, animation in pairs(self.animations) do
+    animation:mirror()
+  end
 end

@@ -45,7 +45,7 @@ function AnimationParser:parseCharacter(image)
 
   end
 
-  return walkAnimationMatrix, panicAnimationMatrix, scale
+  return walkAnimationMatrix, panicAnimationMatrix, scale, quadWidth
 end
 
 
