@@ -20,12 +20,15 @@ local elevator = Elevator:new()
 
 
 Game = {
+  gameDuration = 6 + (4 * math.random() - 2), -- 4 - 8 minutes of gameplay
   player = nil,
   characterList = nil,
   drawables = nil,
   buttonOffsetX = 30,
   buttonOffsetY = 30,
   buttonList = nil,
+  anyButtonClicked = false,
+  ACCUMULATED_TIME_LIMIT = 4,
 }
 Game.__index = Game
 
@@ -47,12 +50,13 @@ local function createCharacter(x, y, spritesheetImage)
 end
 
 local function buttonUpdate(button, f)
-  if button.isDisabled then
-    print("disabled")
+  if button.isDisabled or game.anyButtonPressed then
     return
   else
     f()
+    game.anyButtonPressed = true
     button.isDisabled = true
+    button:setImageDown()
   end
 end
 
@@ -79,17 +83,28 @@ local function createButton(game, title, f)
     x = x,
     y = y,
     text = title,
-    onClick = function(button) buttonUpdate(button, f) end, -- eventTrigger,
+    onClick = function(button)
+      buttonUpdate(button, f)
+    end, -- eventTrigger,
+    mousereleased = function(button)
+      if button.isDisabled then
+        return
+      else
+        button.image = button.imageUp
+      end
+    end,
     accumulatedTime = 0,
     isDisabled = false,
     accumulate = function(self, dt)
       if self.isDisabled then
         self.accumulatedTime = self.accumulatedTime + dt
-        if self.accumulatedTime >= 2 then
+        if self.accumulatedTime >= game.ACCUMULATED_TIME_LIMIT then
           self.isDisabled = false
+          game.anyButtonPressed = false
+          self:setImageUp()
           print("enabled")
           self.accumulatedTime = 0
-        end 
+        end
       end
     end
   }
