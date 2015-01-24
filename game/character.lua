@@ -3,20 +3,14 @@ CharacterPrms = {
 }
 
 Character = {
-  animations = {},
+  animations = nil,
   currentAnimationKey = nil,
 	awkward = 50,
 	panic = 50,
 	x = 500,
 	y = 300,
   color = {255, 255, 255},
-	faces = {
-	  quadArray = {},
-	  index = {},
-	  image = {},
-	  offsetX = 0,
-	  offsetY = 0,
-	},
+	faces = nil,
 }
 Character.__index = Character
 
@@ -24,14 +18,22 @@ Character.__index = Character
 function Character:new(x, y, color)
   local self = setmetatable({}, Character)
 
+  self.animations = {}
+  self.faces = {
+    quadArray = {},
+    index = 1,
+    image = {},
+    offsetX = 0,
+    offsetY = 0,
+  }
   self.x = x or self.x
   self.y = y or self.y
   self.color = color or self.color
-  
-	self.image = CharacterPrms.image
-	self.scale = love.window:getHeight() / self.image:getHeight() / 2
-	
-	return self
+
+  self.image = CharacterPrms.image
+  self.scale = love.window:getHeight() / self.image:getHeight() / 2
+
+  return self
 end
 
 
@@ -61,12 +63,12 @@ end
 
 function Character:update(dt)
   self.animations[self.currentAnimationKey]:update(dt)
-  
+
   self.faces.index = math.floor(self.awkward / 100 * (#self.faces.quadArray - 1)) + 2
   if self.faces.index > #self.faces.quadArray then
     self.faces.index = #self.faces.quadArray
   end
-  
+
   dbg:msg("faceIndex", self.faces.index)
   dbg:msg("character.awkward", self.awkward)
   dbg:msg("character.panic", self.panic)
@@ -78,7 +80,7 @@ function Character:draw()
   love.graphics.setColor(self.color)
   self.animations[self.currentAnimationKey]:draw(self.x, self.y)
   love.graphics.draw(self.faces.image, self.faces.quadArray[self.faces.index], self.x + self.faces.offsetX, self.y + self.faces.offsetY, 0, 0.12)
---  love.graphics.draw(self.image, (love.window:getWidth() - self.image:getWidth()*self.scale) / 2, 200, 0, self.scale)
+  --  love.graphics.draw(self.image, (love.window:getWidth() - self.image:getWidth()*self.scale) / 2, 200, 0, self.scale)
   love.graphics.setColor(r, g, b)
 end
 
@@ -111,14 +113,14 @@ end
 
 
 function Character:event(o)
-	if o.type == "awkward" then
-		--
-	elseif o.name == "dance" then
-		--
-	else
-		self.awkard = self.awkward + o.awkward
-		self.panic = self.panic + o.panic
-	end
+  if o.type == "awkward" then
+  --
+  elseif o.name == "dance" then
+  --
+  else
+    self.awkard = self.awkward + o.awkward
+    self.panic = self.panic + o.panic
+  end
 end
 
 function Character:getY()
