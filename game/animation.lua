@@ -37,9 +37,6 @@ function Animation:update(dt)
     end
   end
   
-  dbg:msg("dt", dt)
-  dbg:msg("curTime", self.currentTime)
-  dbg:msg("quadIndex", self.currentQuadIndex)
 end
 
 
