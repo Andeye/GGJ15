@@ -5,15 +5,15 @@ SoundMusic = {
   isPlayMusic = false
 }
 
-local MUSIC_VOLUME = 0.2
+local MUSIC_VOLUME = 0.5
 
 function SoundMusic:load()
   self.sounds[1] = {}
   
-  self.sounds[1][1] = love.audio.newSource("assets/sounds/music/bossanova-test-1.mp3", "static")
-  self.sounds[1][2] = love.audio.newSource("assets/sounds/music/bossanova-test-2.mp3", "static")
-  self.sounds[1][3] = love.audio.newSource("assets/sounds/music/bossanova-test-3.mp3", "static")
-  self.sounds[1][4] = love.audio.newSource("assets/sounds/music/bossanova-test-4.mp3", "static")
+  self.sounds[1][1] = love.audio.newSource("assets/sounds/music/ElevatorMusic.wav", "static")
+  self.sounds[1][2] = love.audio.newSource("assets/sounds/music/AwkwardMusic1.wav", "static")
+  self.sounds[1][3] = love.audio.newSource("assets/sounds/music/AwkwardMusic2.wav", "static")
+  self.sounds[1][4] = love.audio.newSource("assets/sounds/music/AwkwardMusic3.wav", "static")
   
   for i = 1, #self.sounds do
     for j = 1, #self.sounds[i] do

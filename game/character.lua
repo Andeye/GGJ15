@@ -1,38 +1,26 @@
-CharacterPrms = {
-  image = love.graphics.newImage("assets/graphics/gubbskelett.png"),
-}
+CharacterPrms = {}
 
 Character = {
   animations = nil,
   currentAnimationKey = nil,
-	awkward = 50,
-	panic = 50,
-	x = 500,
-	y = 300,
-  color,
-	faces = nil,
+  awkward = 50,
+  panic = 50,
+  x = 500,
+  y = 300,
+  personality = nil,
   tween,
 }
 Character.__index = Character
 
 
-function Character:new(x, y, color)
+function Character:new(x, y, personality)
   local self = setmetatable({}, Character)
 
   self.animations = {}
-  self.faces = {
-    quadArray = {},
-    index = 1,
-    image = {},
-    offsetX = 0,
-    offsetY = 0,
-  }
   self.x = x or self.x
   self.y = y or self.y
-  self.color = color or {255, 255, 255}
-
-  self.image = CharacterPrms.image
-  self.scale = love.window:getHeight() / self.image:getHeight() / 2
+  self.personality = personality
+  self.currentAnimationKey = "panic"
 
   return self
 end
@@ -65,20 +53,21 @@ function Character:addPanic(dp)
   end
 end
 
+---
+-- http://www.wolframalpha.com/input/?i=plot%28.1975+*+x%5E2+-+39.55+*+x%2B+2000%2C+from+0+to+100%29
+function getPanicSpriteDuration(panic)
+  return .1975 * panic^2 - 39.55 * panic + 2000
+end
+
 
 function Character:update(dt)
-  self.animations[self.currentAnimationKey]:update(dt)
+  local panicSpriteDuration = getPanicSpriteDuration(self.panic)
+  self.animations[self.currentAnimationKey]:update(dt, panicSpriteDuration, self.awkward)
 
-  self.faces.index = math.floor(self.awkward / 100 * (#self.faces.quadArray - 1)) + 2
-  if self.faces.index > #self.faces.quadArray then
-    self.faces.index = #self.faces.quadArray
-  end
-  
   if self.tween then
     self.tween:update(dt)
   end
 
-  dbg:msg("faceIndex", self.faces.index)
   dbg:msg("character.awkward", self.awkward)
   dbg:msg("character.panic", self.panic)
 end
@@ -86,10 +75,8 @@ end
 
 function Character:draw()
   local r, g, b = love.graphics.getColor()
-  love.graphics.setColor(self.color)
+  love.graphics.setColor(self.personality.color)
   self.animations[self.currentAnimationKey]:draw(self.x, self.y)
-  love.graphics.draw(self.faces.image, self.faces.quadArray[self.faces.index], self.x + self.faces.offsetX, self.y + self.faces.offsetY, 0, 0.12)
-  --  love.graphics.draw(self.image, (love.window:getWidth() - self.image:getWidth()*self.scale) / 2, 200, 0, self.scale)
   love.graphics.setColor(r, g, b)
 end
 
@@ -99,15 +86,6 @@ function Character:addAnimation(key, animation)
   if self.currentAnimationKey == nil then
     self.currentAnimationKey = key
   end
-end
-
-
-function Character:setFaces(faceImage, quadArray, offsetX, offsetY)
-  self.faces.image = faceImage
-  self.faces.quadArray = quadArray
-  self.faces.index = 2
-  self.faces.offsetX = offsetX or self.faces.offsetX
-  self.faces.offsetY = offsetY or self.faces.offsetY
 end
 
 
@@ -122,14 +100,15 @@ end
 
 
 function Character:event(o)
-  if o.type == "awkward" then
-  --
-  elseif o.name == "dance" then
-  --
-  else
-    self.awkard = self.awkward + o.awkward
-    self.panic = self.panic + o.panic
+  if o.sender == self then
+    return
   end
+
+  -- TODO: fix this function pointer in personality
+  local p, a = self.personality.reactToEvent(o)
+
+  self:addAwkwardness(a)
+  self:addPanic(p)
 end
 
 function Character:getY()
