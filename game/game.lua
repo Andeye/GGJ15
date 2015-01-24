@@ -65,6 +65,13 @@ function Game:new()
   player = createCharacter(650, 350)
   --  table.insert(characterList, player)
   table.insert(drawables, player)
+  local button = Button:new{x=800, y=200, text="Call elevator", onClick=function()
+      elevator.y = 1000
+      elevator:moveTo(0)
+    end}
+  GUI:addComponent(button)
+  button = Button:new{x=800, y=300, text="Send elevator", onClick=function() elevator:moveTo(-1000) end}
+  GUI:addComponent(button)
 
   return self
 end
@@ -116,6 +123,13 @@ local function input(dt)
   end
   if love.keyboard.isDown("t") then
     player:moveTo(200, -100)
+  end
+  if love.keyboard.isDown("r") then
+    elevator.y = 1000
+    elevator:moveTo(0)
+  end
+  if love.keyboard.isDown("e") then
+    elevator:moveTo(-1000)
   end
 end
 
