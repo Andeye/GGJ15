@@ -106,6 +106,9 @@ local function input(dt)
   if love.keyboard.isDown("d") then
     player:move(100 * dt, 0)
   end
+  if love.keyboard.isDown("t") then
+    player:moveTo(200, -100)
+  end
 end
 
 local function getRoomStatus()
