@@ -38,10 +38,10 @@ local mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/gr
 local function createCharacter(x, y, spritesheetImage)
   local character = Character:new(x, y, PersonalityGenerator:createPersonality())
 
-  local walkAnimationMatrix, panicAnimationMatrix, scale = AnimationParser:parseCharacter(spritesheetImage)
+  local walkAnimationMatrix, panicAnimationMatrix, scale, quadWidth = AnimationParser:parseCharacter(spritesheetImage)
 
-  character:addAnimation("walk", Animation:new(spritesheetImage, walkAnimationMatrix, scale))
-  character:addAnimation("panic", Animation:new(spritesheetImage, panicAnimationMatrix, scale))
+  character:addAnimation("walk", Animation:new(spritesheetImage, walkAnimationMatrix, scale, quadWidth))
+  character:addAnimation("panic", Animation:new(spritesheetImage, panicAnimationMatrix, scale, quadWidth))
 
   return character
 end
@@ -173,6 +173,8 @@ function love.keypressed(key)
     game.characterList[1]:addPanic(5)
   elseif key == "f" then
     SoundSfx:play("fart")
+  elseif key == "m" then
+    game.player:mirror()
   elseif key == "e" then
     local newEvent = EventTypes:getEvent(game.player, "dance")
     for i, character in ipairs(game.characterList) do
