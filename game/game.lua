@@ -10,10 +10,11 @@ love.filesystem.load("animation.lua")()
 love.filesystem.load("animation_parser.lua")()
 
 love.filesystem.load("sound_music.lua")()
-love.filesystem.load("sounds.lua")()
+love.filesystem.load("sound_sfx.lua")()
 
 local elevator = Elevator:new()
 
+local player
 local characterList = {}
 
 Game = {
@@ -36,7 +37,7 @@ local function createCharacter(x, y)
   local faceQuadArray = AnimationParser:parse(faceImage, 1, 5, 1)
   character:setFaces(faceImage, faceQuadArray, 88, 48)
 
-  table.insert(characterList, character)
+  return character
 end
 
 
@@ -46,12 +47,12 @@ function Game:new()
   self.hover = false
 
   SoundMusic:load()
-  Sounds:load()
+  SoundSfx:load()
   
-  createCharacter(450, 300)
-  createCharacter(650, 300)
-  createCharacter(630, 350)
-  createCharacter(550, 150)
+  table.insert(characterList, createCharacter(450, 300))
+  table.insert(characterList, createCharacter(650, 300))
+  table.insert(characterList, createCharacter(630, 350))
+  player = createCharacter(550, 150)
   
   return self
 end
@@ -65,31 +66,33 @@ function love.keypressed(key)
   elseif key == "1" then
     characterList[1]:addAwkwardness(-5)
     characterList[2]:addAwkwardness(-2.5)
+    characterList[3]:addAwkwardness(-7.5)
   elseif key == "2" then
     characterList[1]:addAwkwardness(5)
     characterList[2]:addAwkwardness(2.5)
+    characterList[3]:addAwkwardness(7.5)
   elseif key == "3" then
     characterList[1]:addPanic(-5)
   elseif key == "4" then
     characterList[1]:addPanic(5)
   elseif key == "f" then
-    Sounds:playSfx("fart")
+    SoundSfx:play("fart")
   end
 end
 
 
 local function input(dt)
   if love.keyboard.isDown("w") then
-    characterList[1]:move(0, -100 * dt * 0.47)
+    player:move(0, -100 * dt * 0.47)
   end
   if love.keyboard.isDown("s") then
-    characterList[1]:move(0, 100 * dt * 0.47)
+    player:move(0, 100 * dt * 0.47)
   end
   if love.keyboard.isDown("a") then
-    characterList[1]:move(-100 * dt, 0)
+    player:move(-100 * dt, 0)
   end
   if love.keyboard.isDown("d") then
-    characterList[1]:move(100 * dt, 0)
+    player:move(100 * dt, 0)
   end
 end
 
@@ -111,6 +114,8 @@ function Game:update(dt)
   dbg:msg("Game ID", tostring(self.selected))
 
   input(dt)
+  
+  player:update(dt)
 
   elevator:update(dt)
   for _, character in ipairs(characterList) do
@@ -120,6 +125,7 @@ function Game:update(dt)
   local roomPanic, roomAwkwardness = getRoomStatus()
   dbg:msg("roomPanic", roomPanic)
   dbg:msg("roomAwkwardness", roomAwkwardness)
+  
   SoundMusic:update(dt, roomPanic, roomAwkwardness)
 end
 
@@ -134,4 +140,5 @@ function Game:draw()
     character:draw()
     love.graphics.setColor(r, g, b)
   end
+  player:draw()
 end
