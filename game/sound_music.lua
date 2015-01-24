@@ -5,13 +5,21 @@ SoundMusic = {
   isPlayMusic = false
 }
 
+local MUSIC_VOLUME = 0.2
 
 function SoundMusic:load()
   self.sounds[1] = {}
+  
   self.sounds[1][1] = love.audio.newSource("assets/sounds/music/bossanova-test-1.mp3", "static")
   self.sounds[1][2] = love.audio.newSource("assets/sounds/music/bossanova-test-2.mp3", "static")
   self.sounds[1][3] = love.audio.newSource("assets/sounds/music/bossanova-test-3.mp3", "static")
   self.sounds[1][4] = love.audio.newSource("assets/sounds/music/bossanova-test-4.mp3", "static")
+  
+  for i = 1, #self.sounds do
+    for j = 1, #self.sounds[i] do
+      self.sounds[i][j]:setVolume(MUSIC_VOLUME)
+    end
+  end
 end
 
 
@@ -41,7 +49,9 @@ end
 function SoundMusic:update(dt, roomPanic, roomAwkwardness)
   
   local panicIndex, awkwardIndex = getIndices(self, roomPanic, roomAwkwardness)
-  if panicIndex ~= self.currPanicIndex or awkwardIndex ~= self.currAwkwardIndex then
+  if panicIndex ~= self.currPanicIndex or awkwardIndex ~= self.currAwkwardIndex 
+    and self.sounds[self.currPanicIndex][self.currAwkwardIndex]:isLooping()
+  then
     self.sounds[self.currPanicIndex][self.currAwkwardIndex]:setLooping(false)
   end
   

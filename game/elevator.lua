@@ -64,7 +64,7 @@ end
 
 function Elevator:openDoors()
   if self.currentDoorState == DOOR_STATES.CLOSED then
-    Sounds:playSfx("ding")
+    SoundSfx:play("ding")
   end
   self.currentDoorState = DOOR_STATES.OPENING
 end
