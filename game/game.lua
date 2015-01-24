@@ -15,16 +15,17 @@ love.filesystem.load("sounds.lua")()
 local elevator = Elevator:new()
 
 local characterList = {}
+local drawables = {}
+table.insert(drawables, elevator)
 
 Game = {
   }
 Game.__index = Game
 
-
 ---
 -- Temporary function for creating the test character (whitedude)
-local function createCharacter(x, y)
-  local character = Character:new(x, y)
+local function createCharacter(x, y, color)
+  local character = Character:new(x, y, color)
 
   local image = love.graphics.newImage("assets/graphics/sprites/whitedude_spritesheet.png")
   local quadArray, scale = AnimationParser:parse(image, 1, 4, 1)
@@ -37,9 +38,8 @@ local function createCharacter(x, y)
   character:setFaces(faceImage, faceQuadArray, 88, 48)
 
   table.insert(characterList, character)
+  table.insert(drawables, character)
 end
-
-
 
 function Game:new()
   local self = setmetatable({}, Game)
@@ -48,14 +48,13 @@ function Game:new()
   SoundMusic:load()
   Sounds:load()
   
-  createCharacter(450, 300)
-  createCharacter(650, 300)
-  createCharacter(630, 350)
-  createCharacter(550, 150)
+  createCharacter(450, 300, {255, 0, 0})
+  createCharacter(650, 300, {255, 255, 0})
+  createCharacter(630, 350, {0, 0, 255})
+  createCharacter(550, 150, {255, 0, 255})
   
   return self
 end
-
 
 function love.keypressed(key)
   if key == "left" then
@@ -77,7 +76,6 @@ function love.keypressed(key)
   end
 end
 
-
 local function input(dt)
   if love.keyboard.isDown("w") then
     characterList[1]:move(0, -100 * dt * 0.47)
@@ -93,7 +91,6 @@ local function input(dt)
   end
 end
 
-
 local function getRoomStatus()
   local roomPanic, roomAwkwardness, counter = 0, 0, 0
   
@@ -105,7 +102,6 @@ local function getRoomStatus()
   
   return roomPanic / counter, roomAwkwardness / counter
 end
-
 
 function Game:update(dt)
   dbg:msg("Game ID", tostring(self.selected))
@@ -123,15 +119,13 @@ function Game:update(dt)
   SoundMusic:update(dt, roomPanic, roomAwkwardness)
 end
 
-
--- TODO: REMOVE THIS
-local colors = {{255, 0, 0}, {255, 255, 0}, {0, 0, 255}, {255, 0, 255}}
 function Game:draw()
-  elevator:draw()
-  for i, character in ipairs(characterList) do
-    local r, g, b = love.graphics.getColor()
-    love.graphics.setColor(colors[i])
-    character:draw()
-    love.graphics.setColor(r, g, b)
+  table.sort(drawables, sortY)
+  for k,v in ipairs(drawables) do
+    v:draw()
   end
+end
+
+function sortY(a, b)
+  return a:getY() < b:getY()
 end

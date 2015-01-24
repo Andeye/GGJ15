@@ -93,3 +93,7 @@ function Elevator:draw()
   love.graphics.draw(self.elevatorImage, self.x, self.y, 0, self.scale)
 --  love.graphics.draw(ElevatorPrms.elevatorForground, self.x, self.y, 0, self.scale)
 end
+
+function Elevator:getY()
+	return self.y
+end
