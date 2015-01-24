@@ -5,6 +5,9 @@ pxlScl = love.window.getPixelScale()
 -- pxlScl = 3
 
 love.filesystem.load("character.lua")()
+love.filesystem.load("elevator.lua")()
+
+local elevator = Elevator:new()
 
 Game = {
 }
@@ -26,4 +29,5 @@ function Game:update(dt)
 end
 
 function Game:draw()
+	elevator:draw()
 end
