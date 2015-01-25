@@ -6,8 +6,7 @@ love.filesystem.load("dbg.lua")()
 dbg = Debug:new()
 love.filesystem.load("gamestate.lua")()
 love.filesystem.load("gui.lua")()
-love.filesystem.load("game.lua")()
-love.filesystem.load("game_finished.lua")()
+love.filesystem.load("splash_screen.lua")()
 love.filesystem.load("button.lua")()
 love.filesystem.load("utility.lua")()
 
@@ -21,11 +20,13 @@ function love.load()
   GameState:new()
   GUI:new()
 
-  game = Game:new()
-  gameFinished = GameFinished:new()
-  GameState:add("game", game)
-  GameState:add("gameFinished", gameFinished)
-  GameState:push("game")
+  pxlScl = love.window.getPixelScale()
+
+  splashScreen = SplashScreen:new()
+  GameState:add("splashScreen", splashScreen)
+--  gameFinished = GameFinished:new()
+--  GameState:add("gameFinished", gameFinished)
+  GameState:push("splashScreen")
 end
 
 function love.update(dt)

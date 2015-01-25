@@ -1,8 +1,10 @@
 GamePrms = {
   size = 25,
 }
-pxlScl = love.window.getPixelScale()
+-- pxlScl = love.window.getPixelScale()
 -- pxlScl = 3
+
+love.filesystem.load("game_finished.lua")()
 
 love.filesystem.load("personality_generator.lua")()
 love.filesystem.load("character.lua")()
@@ -40,21 +42,21 @@ Game = {
   buttonList = nil,
   anyButtonClicked = false,
   ACCUMULATED_TIME_LIMIT = 0,
-  skinColorShader = love.graphics.newShader("assets/shaders/skincolor.glsl")
+  skinColorShader = love.graphics.newShader("assets/shaders/skincolor.glsl"),
+  nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png"),
+  nakedDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet_mask.png"),
+  shirtDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet.png"),
+  shirtDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet_mask.png"),
+  flowerLadySpritesheetImage = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet.png"),
+  flowerLadySpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet_mask.png"),
+  mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png"),
+  mainCharacterFrontsideSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet_mask.png"),
+  mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png"),
+  mainCharacterSpecialSpritesheetImage_1_Mask = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1_mask.png"),
 }
 Game.__index = Game
 
 
-local nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
-local nakedDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet_mask.png")
-local shirtDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet.png")
-local shirtDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet_mask.png")
-local flowerLadySpritesheetImage = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet.png")
-local flowerLadySpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet_mask.png")
-local mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png")
-local mainCharacterFrontsideSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet_mask.png")
-local mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png")
-local mainCharacterSpecialSpritesheetImage_1_Mask = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1_mask.png")
 
 ---
 -- Temporary function for creating the test character (whitedude)
@@ -140,7 +142,7 @@ local function createButton(game, title, f)
 end
 
 
-function addSpecialSpriteSheets(player)
+local function addSpecialSpriteSheets(game, player)
 
   -- add the special animations
 
@@ -150,15 +152,15 @@ function addSpecialSpriteSheets(player)
   local scale = nil
   local quadWidth = nil
   for i = 1, totalRows do
-    specialAnimations[i], scale, quadWidth = AnimationParser:parseSpecialSpritesheet(mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
+    specialAnimations[i], scale, quadWidth = AnimationParser:parseSpecialSpritesheet(game.mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
   end
-  player:addSpecialAnimation("handwave", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[1], scale, quadWidth, 100))
-  player:addSpecialAnimation("calm_down", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[2], scale, quadWidth, 150))
-  player:addSpecialAnimation("fart", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[3], scale, quadWidth, 300))
+  player:addSpecialAnimation("handwave", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[1], scale, quadWidth, 100))
+  player:addSpecialAnimation("calm_down", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[2], scale, quadWidth, 150))
+  player:addSpecialAnimation("fart", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[3], scale, quadWidth, 300))
 
   -- add the idle "animation"
-  local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
-  player:addAnimation("idle", Animation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, idleAnimationMatrix, scale, quadWidth))
+  local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(game.mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
+  player:addAnimation("idle", Animation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, idleAnimationMatrix, scale, quadWidth))
   player:playAnimation("idle")
 
 end
@@ -167,6 +169,9 @@ end
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
+
+  gameFinished = GameFinished:new()
+  GameState:add("gameFinished", gameFinished)
 
   self.characterList = {}
   self.drawables = {}
@@ -184,15 +189,15 @@ function Game:new()
   --
   -- create the characters
   --
-  local character = createCharacter(200, 300, shirtDudeSpritesheetImage, shirtDudeSpritesheetImageMask)
+  local character = createCharacter(200, 300, self.shirtDudeSpritesheetImage, self.shirtDudeSpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(300, 150, flowerLadySpritesheetImage, flowerLadySpritesheetImageMask)
+  character = createCharacter(300, 150, self.flowerLadySpritesheetImage, self.flowerLadySpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(550, 250, shirtDudeSpritesheetImage, shirtDudeSpritesheetImageMask)
+  character = createCharacter(550, 250, self.shirtDudeSpritesheetImage, self.shirtDudeSpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
@@ -200,8 +205,8 @@ function Game:new()
   -- Create the player
   --
 
-  self.player = createCharacter(400, 350, mainCharacterFrontsideSpritesheetImage, mainCharacterFrontsideSpritesheetImageMask)
-  addSpecialSpriteSheets(self.player)
+  self.player = createCharacter(400, 350, self.mainCharacterFrontsideSpritesheetImage, self.mainCharacterFrontsideSpritesheetImageMask)
+  addSpecialSpriteSheets(self, self.player)
   table.insert(self.drawables, self.player)
 
   --
@@ -377,9 +382,17 @@ end
 
 function Game:draw()
   --[[
+
+
   for k,v in pairs(elevator:getDrawables()) do
+
+
     table.insert(self.drawables, v)
+
+
   end
+
+
   --]]
   table.sort(self.drawables, sortZ)
   for k,v in ipairs(self.drawables) do

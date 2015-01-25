@@ -1,5 +1,7 @@
 
-GameFinished = {}
+GameFinished = {
+  started = false,
+}
 GameFinished.__index = GameFinished
 
 
@@ -10,8 +12,12 @@ function GameFinished:new(o)
 end
 
 
+local accTime = 0
+
 function GameFinished:update(dt)
+ 
 end
+
 
 function GameFinished:draw()
   love.graphics.rectangle("fill", 100, 100, love.window:getWidth() - 200, love.window:getHeight() - 200)
