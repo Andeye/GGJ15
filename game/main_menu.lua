@@ -58,8 +58,8 @@ local function startGame(self)
   GameState:pop()
   GameState:push("splashScreen")
   GUI:layerVisible("main_menu_gui", false)
+  
   local screenDumpData = love.graphics.newScreenshot()
-
   splashScreen:setBackground(screenDumpData, self.buttons.scale, self.buttons.startText.x, self.buttons.startText.y)
 end
 

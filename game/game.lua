@@ -387,9 +387,9 @@ function Game:update(dt)
     self:gameLoop(dt)
   elseif self.started then
     -- Do END GAME STUFF/Logic
-    GameState:pop()
-    GameState:push("mainMenu")
+--    GameState:pop()
     GUI:layerVisible("game_gui", false)
+    GameState:push("gameFinished")
   end
   self:coreLoop(dt)
 end
