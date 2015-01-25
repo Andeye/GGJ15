@@ -102,6 +102,9 @@ local function createButton(game, title, f)
     y = y,
     text = title,
     onClick = function(button)
+      if not game.anyButtonPressed then
+        SoundSfx:play("button_click")
+      end
       buttonUpdate(button, f)
     end, -- eventTrigger,
     mousereleased = function(button)
