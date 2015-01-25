@@ -9,7 +9,6 @@ Animation = {
   currentFaceIndex = 1,
   currentTime = 0,
   scale = 1,
-  isMirrored = false,
 }
 Animation.__index = Animation
 
@@ -46,15 +45,10 @@ function Animation:update(dt, spriteDuration, awkwardness)
 end
 
 
-function Animation:draw(x, y)
-  if not self.isMirrored then
+function Animation:draw(x, y, isMirrored)
+  if not isMirrored then
     love.graphics.draw(self.spriteSheet, self.spriteMatrix[self.currentFaceIndex][self.currentQuadIndex], x, y, 0, self.scale)
   else
     love.graphics.draw(self.spriteSheet, self.spriteMatrix[self.currentFaceIndex][self.currentQuadIndex], x + self.quadWidth / 2, y, 0, -self.scale, self.scale)
   end
-end
-
-
-function Animation:mirror()
-  self.isMirrored = not self.isMirrored
 end

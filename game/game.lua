@@ -8,6 +8,7 @@ love.filesystem.load("personality_generator.lua")()
 love.filesystem.load("character.lua")()
 love.filesystem.load("elevator.lua")()
 love.filesystem.load("animation.lua")()
+love.filesystem.load("special_animation.lua")()
 love.filesystem.load("animation_parser.lua")()
 
 love.filesystem.load("sound_music.lua")()
@@ -39,6 +40,7 @@ Game.__index = Game
 local nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
 local shirtDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet.png")
 local mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png")
+local mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png")
 
 ---
 -- Temporary function for creating the test character (whitedude)
@@ -121,6 +123,30 @@ local function createButton(game, title, f)
 end
 
 
+function addSpecialSpriteSheets(player)
+
+  -- add the special animations
+
+  local totalRows = 3
+  local quads = 10
+  local specialAnimations = {}
+  local scale = nil
+  local quadWidth = nil
+  for i = 1, totalRows do
+    specialAnimations[i], scale, quadWidth = AnimationParser:parseSpecialSpritesheet(mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
+  end
+  player:addSpecialAnimation("handwave", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[1], scale, quadWidth, 100))
+  player:addSpecialAnimation("calm_down", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[2], scale, quadWidth, 100))
+  player:addSpecialAnimation("fart", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[3], scale, quadWidth, 300))
+
+  -- add the idle "animation"
+  local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
+  player:addAnimation("idle", Animation:new(mainCharacterSpecialSpritesheetImage_1, idleAnimationMatrix, scale, quadWidth))
+  player:playAnimation("idle")
+
+end
+
+
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
@@ -132,6 +158,9 @@ function Game:new()
   SoundMusic:load()
   SoundSfx:load()
 
+  --
+  -- create the characters
+  --
   local character = createCharacter(450, 300, shirtDudeSpritesheetImage)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
@@ -144,9 +173,17 @@ function Game:new()
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
+  --
+  -- Create the player
+  --
+
   self.player = createCharacter(650, 350, mainCharacterFrontsideSpritesheetImage)
+  addSpecialSpriteSheets(self.player)
   table.insert(self.drawables, self.player)
 
+  --
+  -- Create buttons
+  --
 
   self.buttonList = {}
   GUI:addComponent(createButton(self, "Dance",
@@ -190,6 +227,12 @@ function love.keypressed(key)
     game.characterList[1]:addPanic(-5)
   elseif key == "4" then
     game.characterList[1]:addPanic(5)
+  elseif key == "8" then
+    game.player:playSpecialAnimation("fart")
+  elseif key == "9" then
+    game.player:playSpecialAnimation("handwave")
+  elseif key == "0" then
+    game.player:playSpecialAnimation("calm_down")
   elseif key == "f" then
     SoundSfx:play("fart")
   elseif key == "m" then

@@ -2,7 +2,9 @@ CharacterPrms = {}
 
 Character = {
   animations = nil,
+  specialAnimations = nil,
   currentAnimationKey = nil,
+  currentSpecialAnimationKey = nil,
   awkward = 10,
   panic = 10,
   x = 500,
@@ -17,6 +19,7 @@ function Character:new(x, y, personality)
   local self = setmetatable({}, Character)
 
   self.animations = {}
+  self.specialAnimations = {}
   self.awkward = math.random() * self.awkward
   self.panic = math.random() * self.panic
   self.x = x or self.x
@@ -62,10 +65,40 @@ function getPanicSpriteDuration(panic)
 end
 
 
+function Character:playAnimation(key)
+  if self.animations[key] ~= nil then
+    self.currentAnimationKey = key
+  end
+end
+
+
+function Character:isSpecialAnimationPlaying()
+  local key = self.currentSpecialAnimationKey
+  return key ~= nil and self.specialAnimations[key]:isPlaying()
+end
+
+
+function Character:playSpecialAnimation(key)
+  if not self:isSpecialAnimationPlaying() and self.specialAnimations[key] ~= nil then
+    self.currentSpecialAnimationKey = key
+    self.specialAnimations[key]:play()
+  end
+end
+
+
 function Character:update(dt)
 
-  local panicSpriteDuration = getPanicSpriteDuration(self.panic)
-  self.animations[self.currentAnimationKey]:update(dt, panicSpriteDuration, self.awkward)
+  if self:isSpecialAnimationPlaying() then
+    local key = self.currentSpecialAnimationKey
+    self.specialAnimations[key]:update(dt)
+    if not self.specialAnimations[key]:isPlaying() then
+      self.currentSpecialAnimationKey = nil
+    end
+  else
+    local panicSpriteDuration = getPanicSpriteDuration(self.panic)
+    self.animations[self.currentAnimationKey]:update(dt, panicSpriteDuration, self.awkward)
+  end
+
 
   if self.tween then
     self.tween:update(dt)
@@ -74,13 +107,18 @@ function Character:update(dt)
   dbg:msg("-----------------------------------", "")
   dbg:msg("character.awkward", self.awkward)
   dbg:msg("character.panic", self.panic)
+  
 end
 
 
 function Character:draw()
   local r, g, b = love.graphics.getColor()
   love.graphics.setColor(self.personality.color)
-  self.animations[self.currentAnimationKey]:draw(self.x, self.y)
+  if self:isSpecialAnimationPlaying() then
+    self.specialAnimations[self.currentSpecialAnimationKey]:draw(self.x, self.y, self.isMirrored)
+  else
+    self.animations[self.currentAnimationKey]:draw(self.x, self.y, self.isMirrored)
+  end
   love.graphics.setColor(r, g, b)
 end
 
@@ -89,6 +127,14 @@ function Character:addAnimation(key, animation)
   self.animations[key] = animation
   if self.currentAnimationKey == nil then
     self.currentAnimationKey = key
+  end
+end
+
+
+function Character:addSpecialAnimation(key, animation)
+  self.specialAnimations[key] = animation
+  if self.currentSpecialAnimationKey == nil then
+    self.currentSpecialAnimationKey = key
   end
 end
 
@@ -119,7 +165,5 @@ function Character:getY()
 end
 
 function Character:mirror()
-  for _, animation in pairs(self.animations) do
-    animation:mirror()
-  end
+  self.isMirrored = not self.isMirrored
 end
