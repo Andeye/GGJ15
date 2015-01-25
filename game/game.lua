@@ -79,10 +79,10 @@ local function buttonUpdate(button, f)
   if button.isDisabled or game.anyButtonPressed then
     return
   else
-    f()
     game.anyButtonPressed = true
     button.isDisabled = true
     button:setLitUp(true)
+    f()
   end
 end
 
@@ -154,7 +154,7 @@ local function addSpecialSpriteSheets(game, player)
   player:addSpecialAnimation("handwave", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[1], scale, quadWidth, 100))
   player:addSpecialAnimation("calm_down", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[2], scale, quadWidth, 150))
   player:addSpecialAnimation("fart", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[3], scale, quadWidth, 300))
-  player:addSpecialAnimation("dance", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[4], scale, quadWidth, 120))
+  player:addSpecialAnimation("dance", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[4], scale, quadWidth, 100))
 
   -- add the idle "animation"
   local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(game.mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
@@ -206,6 +206,7 @@ function Game:new()
     self.buttonList = {}
     self:createGameButtons()
     self.started = true
+    game.anyButtonPressed = false
   end), "enter")
 
   --
