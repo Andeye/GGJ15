@@ -6,10 +6,10 @@ GameFinished.__index = GameFinished
 function GameFinished:new(o)
   local self = setmetatable(o or {}, GameFinished)
 
-  --  self.image = love.graphics.newImage("assets/graphics/credits.png")
-  --  self.scale = love.window:getHeight() / self.image:getHeight()
-  --  self.x = (love.window:getWidth() - self.image:getWidth() * self.scale) / 2
-  --  self.y = (love.window:getHeight() - self.image:getHeight() * self.scale) / 2
+    self.image = love.graphics.newImage("assets/graphics/credits_page/creditssmall.png")
+    self.scale = love.window:getHeight() / self.image:getHeight()
+    self.x = (love.window:getWidth() - self.image:getWidth() * self.scale) / 2
+    self.y = (love.window:getHeight() - self.image:getHeight() * self.scale) / 2
 
   return self
 end
