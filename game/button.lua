@@ -83,10 +83,12 @@ function Button:setImageDown()
 end
 
 function Button:mousepressed()
+  SoundSfx:play("button_click")
   self:setImageDown()
 end
 
 function Button:mousereleased()
+  SoundSfx:play("button_release")
   self:setImageUp()
 end
 

@@ -258,9 +258,9 @@ function Game:createGameButtons()
     end))
   GUI:addComponent(createButton(self, "Fart",
     function()
-      sendGlobalEvent(self, "fart")
+      sendGlobalEvent(self, "fart_player")
       game.player:playSpecialAnimation("fart")
-      SoundSfx:play("fart_male_" .. math.random(1, 3))
+      SoundSfx:play("fart_player")
     end))
   GUI:addComponent(createButton(self, "Wave",
     function()

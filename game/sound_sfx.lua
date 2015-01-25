@@ -22,10 +22,12 @@ function SoundSfx:load()
   
   -- set specific sound volumes
   self:setVolume("button_click", .15)
+  self:setVolume("button_release", .6)
 end
 
 
 function SoundSfx:play(key)
+  print("Playing sound: " .. key)
   if self.sounds[key] then
     self.sounds[key]:play()
   end
