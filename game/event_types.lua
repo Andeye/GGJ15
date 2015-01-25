@@ -67,23 +67,28 @@ EventType["light_flickering"] = {
 local randomTypes = {"fart", "scream", "light_flickering", "chuckle"}
 
 function EventTypes:getRandomEvent(sender, filter)
+  -- TODO: refactor to another method
   local tempRandomTypes = {}
-  for k, v in ipairs(randomTypes) do
+  local i = 1
+  for k, v in pairs(randomTypes) do
     if v == "scream" and not filter.canScream then
     elseif v == "chuckle" and not filter.canChuckle then
     else
-      tempRandomTypes[k] = v
+      tempRandomTypes[i] = v
+      i = i + 1
     end
   end
-
-  dbg:msg("temp", dbg:serialize(tempRandomTypes))
 
   return self:getEvent(sender, tempRandomTypes[math.random(1, #tempRandomTypes)])
 end
 
 function EventTypes:getEvent(sender, type, callback)
   if sender == nil or type == nil then
-    error("Can't use events without sender")
+    if sender == nil then
+      error("Can't use events without sender")
+    else
+      error("Can't use events without type")
+    end
   end
 
   local eventType = EventType[type]
