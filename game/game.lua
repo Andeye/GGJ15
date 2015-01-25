@@ -4,6 +4,8 @@ GamePrms = {
 -- pxlScl = love.window.getPixelScale()
 -- pxlScl = 3
 
+love.filesystem.load("game_finished.lua")()
+
 love.filesystem.load("personality_generator.lua")()
 love.filesystem.load("character.lua")()
 love.filesystem.load("elevator.lua")()
@@ -28,7 +30,7 @@ shaft.scale = elevator.scale
 
 
 Game = {
-  GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
+  GAME_DURATION = (6 + (4 * math.random() - 2)), --* 60, -- 4 - 8 minutes of gameplay
   MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 5,  -- TODO: change this to 20 (or suitable for gameplay)
   accumulatedGameTime = 0,
   accTimeBetweenRandomEvents = 0,
@@ -162,6 +164,9 @@ end
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
+  
+  gameFinished = GameFinished:new()
+  GameState:add("gameFinished", gameFinished)
 
   self.characterList = {}
   self.drawables = {}
