@@ -163,7 +163,11 @@ local function addSpecialSpriteSheets(game, player)
   -- add the idle "animation"
   local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(game.mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
   player:addAnimation("idle", Animation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, idleAnimationMatrix, scale, quadWidth))
-  player:playAnimation("idle")
+
+  player:mirror()
+  player:playAnimation("panic")
+  player:addPanic(-100)
+  player:addPanic(80)
 
 end
 
