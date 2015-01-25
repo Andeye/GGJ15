@@ -175,8 +175,8 @@ end
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
-  
-  self.GAME_DURATION = (6 + (4 * math.random() - 2)) * 60 -- 4 - 8 minutes of gameplay
+
+  self.GAME_DURATION = 10 -- (6 + (4 * math.random() - 2)) -- * 60 -- 4 - 8 minutes of gameplay
 
   gameFinished = GameFinished:new()
   GameState:add("gameFinished", gameFinished)
@@ -203,22 +203,22 @@ function Game:new()
   table.insert(self.drawables, self.player)
 
   self.player.z = 840
-  
+
   self.buttonList = {}
-  
+
   GUI:addLayer("game_gui", true)
 
   GUI:addComponent(createButton(self, "Enter",
-  function()
-    GUI:delComponent(self.buttonList[1], "enter")
-    self.buttonList = {}
-    self:createGameButtons()
-    self.started = true
-    game.anyButtonPressed = false
+    function()
+      GUI:delComponent(self.buttonList[1], "enter")
+      self.buttonList = {}
+      self:createGameButtons()
+      self.started = true
+      game.anyButtonPressed = false
 
-    self.player.inElevator = true
-    self.player:moveTo(350, 400, 1000, length)
-  end), "enter", "game_gui")
+      self.player.inElevator = true
+      self.player:moveTo(350, 400, 1000, length)
+    end), "enter", "game_gui")
 
   --
   -- Create buttons
@@ -388,13 +388,17 @@ function Game:update(dt)
   if self.startIdleTime > self.START_IDLE_ELEVATOR_FREQ then
     self:startIdleLoop()
   end
-  
+
+  if self.started and self.accumulatedGameTime >= self.GAME_DURATION - 3 then
+    GUI:layerVisible("game_gui", false)
+    elevator:openDoors()
+  end
+
   if self.started and self.accumulatedGameTime < self.GAME_DURATION then
     self:gameLoop(dt)
   elseif self.started then
     -- Do END GAME STUFF/Logic
---    GameState:pop()
-    GUI:layerVisible("game_gui", false)
+    --    GameState:pop()
     GameState:push("gameFinished")
   end
   self:coreLoop(dt)
@@ -405,54 +409,54 @@ function Game:coreLoop(dt)
 end
 
 function Game:gameLoop(dt)
-    input(dt)
+  input(dt)
 
-    self.player:update(dt)
+  self.player:update(dt)
 
+  for _, character in ipairs(self.characterList) do
+    character:update(dt)
+  end
+
+  local roomPanic, roomAwkwardness = getRoomStatus(self)
+  local roomMean = (roomPanic + roomAwkwardness) / 2
+  self.accTimeBetweenRandomEvents = self.accTimeBetweenRandomEvents + dt
+
+  -- TODO: Change 100 to 1000 or 10000 for more seldom events
+  if self.accTimeBetweenRandomEvents > self.MINIMI_TIME_BETWEEN_RANDOM_EVENTS and math.random() < roomMean / 1000 then
+    dbg:msg("room mean", roomMean)
+
+    local filter = {
+      canScream = false,
+      canChuckle = false,
+      canSob = false,
+    }
     for _, character in ipairs(self.characterList) do
-      character:update(dt)
-    end
-
-    local roomPanic, roomAwkwardness = getRoomStatus(self)
-    local roomMean = (roomPanic + roomAwkwardness) / 2
-    self.accTimeBetweenRandomEvents = self.accTimeBetweenRandomEvents + dt
-
-    -- TODO: Change 100 to 1000 or 10000 for more seldom events
-    if self.accTimeBetweenRandomEvents > self.MINIMI_TIME_BETWEEN_RANDOM_EVENTS and math.random() < roomMean / 1000 then
-      dbg:msg("room mean", roomMean)
-
-      local filter = {
-        canScream = false,
-        canChuckle = false,
-        canSob = false,
-      }
-      for _, character in ipairs(self.characterList) do
-        if character.panic > 90 then
-          filter.canScream = true
-        end
-        if character.panic < 40 then
-          filter.canChuckle = true
-        end
-        if character.panic > 60 then
-          filter.canSob = true
-        end
+      if character.panic > 90 then
+        filter.canScream = true
       end
-      local newEvent = EventTypes:getRandomEvent("elevator", filter)
-      for _, character in ipairs(self.characterList) do
-        character:event(newEvent)
+      if character.panic < 40 then
+        filter.canChuckle = true
       end
-      self.accTimeBetweenRandomEvents = 0
+      if character.panic > 60 then
+        filter.canSob = true
+      end
     end
-
-    for _, button in ipairs(self.buttonList) do
-      button:accumulate(dt)
+    local newEvent = EventTypes:getRandomEvent("elevator", filter)
+    for _, character in ipairs(self.characterList) do
+      character:event(newEvent)
     end
+    self.accTimeBetweenRandomEvents = 0
+  end
 
-    dbg:msg("---------------------------", "")
-    dbg:msg("roomPanic", roomPanic)
-    dbg:msg("roomAwkwardness", roomAwkwardness)
+  for _, button in ipairs(self.buttonList) do
+    button:accumulate(dt)
+  end
 
-    SoundMusic:update(dt, roomPanic, roomAwkwardness)
+  dbg:msg("---------------------------", "")
+  dbg:msg("roomPanic", roomPanic)
+  dbg:msg("roomAwkwardness", roomAwkwardness)
+
+  SoundMusic:update(dt, roomPanic, roomAwkwardness)
 end
 
 function Game:startIdleLoop()
@@ -475,19 +479,11 @@ function Game:startIdleLoop()
 end
 
 function Game:draw()
-  --[[
-
-
-  for k,v in pairs(elevator:getDrawables()) do
-
-
-    table.insert(self.drawables, v)
-
-
-  end
-
-
-  --]]
+  --
+  --  for k,v in pairs(elevator:getDrawables()) do
+  --    table.insert(self.drawables, v)
+  --  end
+  --
   table.sort(self.drawables, sortZ)
   for k,v in ipairs(self.drawables) do
     v:draw()

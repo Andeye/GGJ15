@@ -109,8 +109,8 @@ function EventTypes:getEvent(sender, type, callback)
     error("Unrecognized event type: " .. dbg:serialize(type))
   end
 
-  local panicValue = math.random(0, 10) * eventType.panicSign
-  local awkwardValue = math.random(0, 10) * eventType.awkwardSign
+  local panicValue = math.random(0, 20) * eventType.panicSign
+  local awkwardValue = math.random(0, 20) * eventType.awkwardSign
 
   if callback then
     eventType.callback = callback
