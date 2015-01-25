@@ -34,6 +34,7 @@ function love.load()
 end
 
 function love.update(dt)
+  if dt > 1/15 then dt = 1/15 end -- simple fps correction
   GameState:update(dt)
   GUI:update(dt)
 end

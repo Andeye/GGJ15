@@ -10,7 +10,7 @@ Character = {
   x = 500,
   y = 300,
   z = 1000,
-  inElevator = false,
+  inElevator = true,
   personality = nil,
   tween,
 }
