@@ -224,6 +224,7 @@ function Game:new()
   GUI:layerVisible("enter", false)
 
   elevator:moveTo(0)
+  self:createCharacters()
 
   --
   -- Create buttons
@@ -300,6 +301,7 @@ function Game:createGameButtons()
 end
 
 function love.keypressed(key)
+--[[
   if key == "left" then
     elevator:openDoors()
   elseif key == "right" then
@@ -337,6 +339,7 @@ function love.keypressed(key)
       game.characterList[i]:event(newEvent)
     end
   end
+]]
 end
 
 local function input(dt)
@@ -480,15 +483,17 @@ function Game:idleLoop()
       elevator:moveTo(0)
       elevator.moving = true
       self:removeCharacters()
-    elseif elevator.y == 0 and elevator:isDoorClosed() and #self.characterList == 0 then
+      self:createCharacters()
+      elevator.ready = true
+    elseif elevator.y == 0 and elevator:isDoorClosed() and elevator.ready then
       print("2")
       elevator:openDoors()
       self.startIdleTime = 0
-    elseif elevator.y == 0 and elevator:isDoorOpen() and #self.characterList == 0 then
+    elseif elevator.y == 0 and elevator:isDoorOpen() and elevator.ready then
       print("3")
       self.startIdleTime = 0
       GUI:layerVisible("enter", true)
-      self:createCharacters()
+      elevator.ready = false
     end
   end
 end

@@ -26,6 +26,7 @@ Elevator = {
   currentDoorState = DOOR_STATES.CLOSED,
   moving = false,
   justMoved = true,
+  ready = true,
 }
 Elevator.__index = Elevator
 

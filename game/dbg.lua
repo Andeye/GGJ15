@@ -50,4 +50,5 @@ Debug_dummy = {
 new = function() return Debug_dummy end,
 msg = function() end,
 out = function() return "" end,
+serialize = function() return "" end,
 }
