@@ -175,8 +175,9 @@ end
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
-
-  self.GAME_DURATION = 10 -- (6 + (4 * math.random() - 2)) -- * 60 -- 4 - 8 minutes of gameplay
+  
+  love.math.setRandomSeed(os.clock()^3)
+  self.GAME_DURATION = (6 + (4 * love.math.random() - 2)) * 60 -- 4 - 8 minutes of gameplay
 
   gameFinished = GameFinished:new()
   GameState:add("gameFinished", gameFinished)
