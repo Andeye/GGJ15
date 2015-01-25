@@ -30,7 +30,7 @@ shaft.scale = elevator.scale
 
 
 Game = {
-  GAME_DURATION = (6 + (4 * math.random() - 2)), -- * 60, -- 4 - 8 minutes of gameplay
+  GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
   MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 5,  -- TODO: change this to 20 (or suitable for gameplay)
   START_IDLE_ELEVATOR_FREQ = 3, -- how often the elevators come by in the beginning when idle
   accumulatedGameTime = 0,
@@ -175,6 +175,8 @@ end
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
+  
+  self.GAME_DURATION = (6 + (4 * math.random() - 2)) * 60 -- 4 - 8 minutes of gameplay
 
   gameFinished = GameFinished:new()
   GameState:add("gameFinished", gameFinished)
