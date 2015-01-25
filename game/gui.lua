@@ -115,8 +115,12 @@ function GUI:addComponent(component, layer)
 	end
 end
 
-function GUI:delComponent(component)
-	self.components[component] = nil
+function GUI:delComponent(component, layer)
+  if layer then
+    self.layers[layer].components[component] = nil
+  else
+    self.components[component] = nil
+  end
 end
 
 function GUI:addLayer(layer, visible)
