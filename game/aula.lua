@@ -36,7 +36,7 @@ function Aula:getDrawables()
       draw=draw,
 			getY=function() return self.y end,
 			image=self.barsImage,
-			getZ=function() return self.y - 1000 end,
+			getZ=function() return self.y + 2000 end,
 			0,
 			scale=self.scale
     }

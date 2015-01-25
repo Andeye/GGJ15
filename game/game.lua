@@ -32,7 +32,9 @@ shaft.scale = elevator.scale
 Game = {
   GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
   MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 5,  -- TODO: change this to 20 (or suitable for gameplay)
+  START_IDLE_ELEVATOR_FREQ = 3, -- how often the elevators come by in the beginning when idle
   accumulatedGameTime = 0,
+  startIdleTime = 0,
   accTimeBetweenRandomEvents = 0,
   player = nil,
   characterList = nil,
@@ -42,6 +44,7 @@ Game = {
   buttonList = nil,
   anyButtonClicked = false,
   ACCUMULATED_TIME_LIMIT = 0,
+  started = false,
   skinColorShader = love.graphics.newShader("assets/shaders/skincolor.glsl"),
   nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png"),
   nakedDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet_mask.png"),
@@ -189,7 +192,37 @@ function Game:new()
   --
   -- create the characters
   --
-  local character = createCharacter(200, 300, self.shirtDudeSpritesheetImage, self.shirtDudeSpritesheetImageMask)
+  self:createCharacters()
+  -- self:removeCharacters()
+
+  --
+  -- Create the player
+  --
+
+  self.player = createCharacter(400, 350, self.mainCharacterFrontsideSpritesheetImage, self.mainCharacterFrontsideSpritesheetImageMask)
+  addSpecialSpriteSheets(self, self.player)
+  table.insert(self.drawables, self.player)
+
+  self.buttonList = {}
+
+  GUI:addComponent(createButton(self, "Enter",
+  function()
+    GUI:delComponent(self.buttonList[1], "enter")
+    self.buttonList = {}
+    self:createGameButtons()
+    self.started = true
+  end), "enter")
+
+  --
+  -- Create buttons
+  --
+  -- self:createGameButtons()
+
+  return self
+end
+
+function Game:createCharacters()
+   local character = createCharacter(200, 300, self.shirtDudeSpritesheetImage, self.shirtDudeSpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
@@ -200,20 +233,20 @@ function Game:new()
   character = createCharacter(550, 250, self.shirtDudeSpritesheetImage, self.shirtDudeSpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
+end
 
-  --
-  -- Create the player
-  --
+function Game:removeCharacters()
+  for k,v in pairs(self.characterList) do
+    for k2,v2 in pairs(self.drawables) do
+      if v == v2 then
+        self.drawables[k2] = nil
+      end
+    end
+  end
+  self.characterList = {}
+end
 
-  self.player = createCharacter(400, 350, self.mainCharacterFrontsideSpritesheetImage, self.mainCharacterFrontsideSpritesheetImageMask)
-  addSpecialSpriteSheets(self, self.player)
-  table.insert(self.drawables, self.player)
-
-  --
-  -- Create buttons
-  --
-
-  self.buttonList = {}
+function Game:createGameButtons()
   GUI:addComponent(createButton(self, "Dance",
     function()
       sendGlobalEvent(self, "dance")
@@ -240,8 +273,6 @@ function Game:new()
   end))
   GUI:addComponent(createButton(self, "Tell joke", function() sendGlobalEvent(self, "tell_joke") end))
   GUI:addComponent(createButton(self, "Irritate", function() sendGlobalEvent(self, "irritate") end))
-
-  return self
 end
 
 function love.keypressed(key)
@@ -326,9 +357,28 @@ function Game:update(dt)
   dbg:msg("Game time", self.accumulatedGameTime)
   dbg:msg("Game Ends", self.GAME_DURATION)
 
-  self.accumulatedGameTime = self.accumulatedGameTime + dt
+  if self.started then
+    self.accumulatedGameTime = self.accumulatedGameTime + dt
+  else
+    self.startIdleTime = self.startIdleTime + dt
+  end
 
-  if self.accumulatedGameTime < self.GAME_DURATION then
+  dbg:msg("startIdleTime", self.startIdleTime)
+  dbg:msg("START_IDLE_ELEVATOR_FREQ", self.START_IDLE_ELEVATOR_FREQ)
+  dbg:msg("elevator.y", elevator.y)
+  if self.startIdleTime > self.START_IDLE_ELEVATOR_FREQ then
+    self:startIdleLoop()
+  end
+  
+  if self.started and self.accumulatedGameTime < self.GAME_DURATION then
+    self:coreLoop(dt)
+  elseif self.started then
+    -- Do END GAME STUFF/Logic
+    GameState:push("gameFinished")
+  end
+end
+
+function Game:coreLoop(dt)
     input(dt)
 
     self.player:update(dt)
@@ -378,9 +428,22 @@ function Game:update(dt)
     dbg:msg("roomAwkwardness", roomAwkwardness)
 
     SoundMusic:update(dt, roomPanic, roomAwkwardness)
-  else
-    -- Do END GAME STUFF/Logic
-    GameState:push("gameFinished")
+end
+
+function Game:startIdleLoop()
+  if not elevator.moving then
+    if elevator.y == -1000 then
+      elevator.y = 1000
+      elevator:moveTo(0)
+      elevator.justMoved = true
+    elseif elevator.y == 0 and elevator.justMoved then
+      GUI:layerVisible("enter", true)
+      self.startIdleTime = 0
+      elevator.justMoved = false
+    elseif elevator.y == 0 then
+      GUI:layerVisible("enter", false)
+      elevator:moveTo(-1000)
+    end
   end
 end
 

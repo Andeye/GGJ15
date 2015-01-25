@@ -22,7 +22,8 @@ local DOOR_STATES = {
 
 Elevator = {
   doorOffset = MIN_DOOR_OFFSET,
-  currentDoorState = DOOR_STATES.CLOSED
+  currentDoorState = DOOR_STATES.CLOSED,
+  moving = false,
 }
 Elevator.__index = Elevator
 
@@ -88,7 +89,7 @@ function Elevator:update(dt)
   end
 
   if self.tween then
-    self.tween:update(dt)
+    self.moving = not self.tween:update(dt)
   end
 end
 
