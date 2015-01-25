@@ -370,9 +370,9 @@ function Game:update(dt)
     self:startIdleLoop()
   end
   
-  if self.accumulatedGameTime < self.GAME_DURATION then
+  if self.started and self.accumulatedGameTime < self.GAME_DURATION then
     self:coreLoop(dt)
-  else
+  elseif self.started then
     -- Do END GAME STUFF/Logic
     GameState:push("gameFinished")
   end
