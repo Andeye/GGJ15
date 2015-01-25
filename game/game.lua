@@ -370,19 +370,23 @@ function Game:update(dt)
   end
   
   if self.started and self.accumulatedGameTime < self.GAME_DURATION then
-    self:coreLoop(dt)
+    self:gameLoop(dt)
   elseif self.started then
     -- Do END GAME STUFF/Logic
     GameState:push("gameFinished")
   end
+  coreLoop(dt)
 end
 
-function Game:coreLoop(dt)
+function coreLoop(dt)
+  elevator:update(dt)
+end
+
+function Game:gameLoop(dt)
     input(dt)
 
     self.player:update(dt)
 
-    elevator:update(dt)
     for _, character in ipairs(self.characterList) do
       character:update(dt)
     end
