@@ -7,7 +7,8 @@ SpecialAnimation = {
   currentQuadIndex = nil,
   currentTime = 0,
   scale = 1,
-  duration = nil
+  duration = nil,
+  loopsLeft = nil,
 }
 SpecialAnimation.__index = SpecialAnimation
 
@@ -26,9 +27,10 @@ function SpecialAnimation:new(spriteSheetImage, spriteSheetMask, spriteArray, sc
 end
 
 
-function SpecialAnimation:play()
+function SpecialAnimation:play(times)
   self.currentQuadIndex = 1
   self.currentTime = 0
+  self.loopsLeft = times or 1
 end
 
 
@@ -49,7 +51,12 @@ function SpecialAnimation:update(dt, spriteDuration, awkwardness)
     self.currentTime = self.currentTime - self.duration
     self.currentQuadIndex = self.currentQuadIndex + 1
     if self.currentQuadIndex > #self.spriteArray then
-      self.currentQuadIndex = nil
+      if self.loopsLeft > 1 then
+        self.loopsLeft = self.loopsLeft - 1
+        self.currentQuadIndex = 1
+      else
+        self.currentQuadIndex = nil
+      end
     end
   end
 

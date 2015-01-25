@@ -78,10 +78,10 @@ function Character:isSpecialAnimationPlaying()
 end
 
 
-function Character:playSpecialAnimation(key)
+function Character:playSpecialAnimation(key, times)
   if not self:isSpecialAnimationPlaying() and self.specialAnimations[key] ~= nil then
     self.currentSpecialAnimationKey = key
-    self.specialAnimations[key]:play()
+    self.specialAnimations[key]:play(times)
   end
 end
 
