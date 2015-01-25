@@ -75,7 +75,6 @@ end
 
 
 function Elevator:openDoors()
-print("asdasdasdasdasdasdas")
   if self.currentDoorState == DOOR_STATES.CLOSED then
     SoundSfx:play("ding")
   end

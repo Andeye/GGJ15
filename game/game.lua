@@ -497,7 +497,6 @@ end
 function Game:idleLoop()
   if not elevator.moving then
     if elevator.y == -1000 then
-      print("1")
       elevator.y = 1000
       elevator:moveTo(0)
       elevator.moving = true
@@ -505,11 +504,9 @@ function Game:idleLoop()
       self:createCharacters()
       elevator.ready = true
     elseif elevator.y == 0 and elevator:isDoorClosed() and elevator.ready then
-      print("2")
       elevator:openDoors()
       self.startIdleTime = 0
     elseif elevator.y == 0 and elevator:isDoorOpen() and elevator.ready then
-      print("3")
       self.startIdleTime = 0
       GUI:layerVisible("enter", true)
       elevator.ready = false
@@ -520,11 +517,9 @@ end
 function Game:startIdleLoop()
   if not elevator.moving then
     if elevator:isDoorOpen() then
-      print("4")
       elevator:closeDoors()
       GUI:layerVisible("enter", false)
     elseif elevator:isDoorClosed() then
-      print("5")
       elevator:moveTo(-1000)
     end
   end
