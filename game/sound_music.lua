@@ -5,7 +5,7 @@ SoundMusic = {
   isPlayMusic = false
 }
 
-local MUSIC_VOLUME = 0.5
+local MUSIC_VOLUME = 0.25
 
 function SoundMusic:load()
   self.sounds[1] = {}
