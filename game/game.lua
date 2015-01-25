@@ -31,7 +31,7 @@ shaft.scale = elevator.scale
 
 Game = {
   GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
-  MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 5,  -- TODO: change this to 20 (or suitable for gameplay)
+  MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 20,  -- TODO: change this to 20 (or suitable for gameplay)
   START_IDLE_ELEVATOR_FREQ = 3, -- how often the elevators come by in the beginning when idle
   accumulatedGameTime = 0,
   startIdleTime = 0,
@@ -418,7 +418,7 @@ function Game:gameLoop(dt)
     self.accTimeBetweenRandomEvents = self.accTimeBetweenRandomEvents + dt
 
     -- TODO: Change 100 to 1000 or 10000 for more seldom events
-    if self.accTimeBetweenRandomEvents > self.MINIMI_TIME_BETWEEN_RANDOM_EVENTS and math.random() < roomMean / 100 then
+    if self.accTimeBetweenRandomEvents > self.MINIMI_TIME_BETWEEN_RANDOM_EVENTS and math.random() < roomMean / 1000 then
       dbg:msg("room mean", roomMean)
 
       local filter = {
