@@ -53,6 +53,8 @@ Game = {
   shirtDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet_mask.png"),
   flowerLadySpritesheetImage = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet.png"),
   flowerLadySpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet_mask.png"),
+  beardGuySpritesheetImage = love.graphics.newImage("assets/graphics/sprites/beard_guy_spritesheet.png"),
+  beardGuySpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/beard_guy_spritesheet_mask.png"),
   mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png"),
   mainCharacterFrontsideSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet_mask.png"),
   mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png"),
@@ -227,7 +229,7 @@ function Game:createCharacters()
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(550, 250, self.shirtDudeSpritesheetImage, self.shirtDudeSpritesheetImageMask)
+  character = createCharacter(550, 250, self.beardGuySpritesheetImage, self.beardGuySpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 end
