@@ -108,7 +108,6 @@ function Character:event(o)
     return
   end
 
-  -- TODO: fix this function pointer in personality
   local p, a = self.personality:reactToEvent(o)
 
   self:addAwkwardness(a)

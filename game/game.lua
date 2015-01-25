@@ -21,7 +21,9 @@ local elevator = Elevator:new()
 
 Game = {
   GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
+  MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 5,  -- TODO: change this to 20 (or suitable for gameplay)
   accumulatedGameTime = 0,
+  accTimeBetweenRandomEvents = 0,
   player = nil,
   characterList = nil,
   drawables = nil,
@@ -29,12 +31,13 @@ Game = {
   buttonOffsetY = 30,
   buttonList = nil,
   anyButtonClicked = false,
-  ACCUMULATED_TIME_LIMIT = 4,
+  ACCUMULATED_TIME_LIMIT = 0,
 }
 Game.__index = Game
 
 
 local nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
+local shirtDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet.png")
 local mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png")
 
 ---
@@ -129,7 +132,7 @@ function Game:new()
   SoundMusic:load()
   SoundSfx:load()
 
-  local character = createCharacter(450, 300, nakedDudeSpritesheetImage)
+  local character = createCharacter(450, 300, shirtDudeSpritesheetImage)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
@@ -137,7 +140,7 @@ function Game:new()
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(800, 250, nakedDudeSpritesheetImage)
+  character = createCharacter(800, 250, shirtDudeSpritesheetImage)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
@@ -260,6 +263,30 @@ function Game:update(dt)
     end
 
     local roomPanic, roomAwkwardness = getRoomStatus(self)
+    local roomMean = (roomPanic + roomAwkwardness) / 2
+    self.accTimeBetweenRandomEvents = self.accTimeBetweenRandomEvents + dt
+
+    if self.accTimeBetweenRandomEvents > self.MINIMI_TIME_BETWEEN_RANDOM_EVENTS and math.random() < roomMean / 100 then
+      dbg:msg("room mean", roomMean)
+
+      local filter = {
+        canScream = false,
+        canChuckle = false,
+      }
+      for _, character in ipairs(self.characterList) do
+        if character.panic > 80 then
+          filter.canScream = true
+        end
+        if character.panic < 40 then
+          filter.canChuckle = true
+        end
+      end
+      local newEvent = EventTypes:getRandomEvent("elevator", filter)
+      for _, character in ipairs(self.characterList) do
+        character:event(newEvent)
+      end
+      self.accTimeBetweenRandomEvents = 0
+    end
 
     for _, button in ipairs(self.buttonList) do
       button:accumulate(dt)
@@ -284,4 +311,8 @@ end
 
 function sortY(a, b)
   return a:getY() < b:getY()
+end
+
+function Game:flickerLights()
+  print("flickering")
 end
