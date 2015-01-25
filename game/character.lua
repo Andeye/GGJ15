@@ -163,7 +163,7 @@ function Character:event(o)
 end
 
 function Character:getZ()
-  return self.y
+  return self.y + 1000
 end
 
 function Character:mirror()

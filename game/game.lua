@@ -165,7 +165,9 @@ function Game:new()
 
   self.characterList = {}
   self.drawables = {}
-  table.insert(self.drawables, aula)
+  for k,v in pairs(aula:getDrawables()) do
+    table.insert(self.drawables, v)
+  end
   table.insert(self.drawables, shaft)
   for k,v in pairs(elevator:getDrawables()) do
     table.insert(self.drawables, v)
