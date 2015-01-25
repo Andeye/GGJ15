@@ -199,6 +199,8 @@ function Game:new()
   self.player.z = 840
   
   self.buttonList = {}
+  
+  GUI:addLayer("game_gui", true)
 
   GUI:addComponent(createButton(self, "Enter",
   function()
@@ -210,7 +212,7 @@ function Game:new()
 
     self.player.inElevator = true
     self.player:moveTo(350, 400, 1000, length)
-  end), "enter")
+  end), "enter", "game_gui")
 
   --
   -- Create buttons
@@ -251,37 +253,37 @@ function Game:createGameButtons()
     function()
       sendGlobalEvent(self, "dance")
       game.player:playSpecialAnimation("dance", 3)
-    end))
+    end), "game_gui")
   GUI:addComponent(createButton(self, "Calm down",
     function()
       sendGlobalEvent(self, "calm_down")
       game.player:playSpecialAnimation("calm_down")
-    end))
+    end), "game_gui")
   GUI:addComponent(createButton(self, "Fart",
     function()
       sendGlobalEvent(self, "fart_player")
       game.player:playSpecialAnimation("fart")
       SoundSfx:play("fart_player")
-    end))
+    end), "game_gui")
   GUI:addComponent(createButton(self, "Wave",
     function()
       sendGlobalEvent(self, "wave")
       game.player:playSpecialAnimation("handwave")
-    end))
+    end), "game_gui")
   GUI:addComponent(createButton(self, "Flirt", function()
     sendGlobalEvent(self, "flirt")
     SoundSfx:play("kiss_female_" .. math.random(1, 2))
-  end))
+  end), "game_gui")
   GUI:addComponent(createButton(self, "Tell joke",
     function()
       sendGlobalEvent(self, "tell_joke")
       game.player:playSpecialAnimation("tell_joke", 2)
-    end))
+    end), "game_gui")
   GUI:addComponent(createButton(self, "Irritate",
     function()
       sendGlobalEvent(self, "irritate")
       game.player:playSpecialAnimation("irritate")
-    end))
+    end), "game_gui")
 
   return self
 end
@@ -387,6 +389,7 @@ function Game:update(dt)
     -- Do END GAME STUFF/Logic
     GameState:pop()
     GameState:push("mainMenu")
+    GUI:layerVisible("game_gui", false)
   end
   self:coreLoop(dt)
 end
