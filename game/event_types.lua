@@ -59,6 +59,13 @@ EventType["chuckle"] = {
     SoundSfx:play("chuckle_male_" .. math.random(1, 3))
   end,
 }
+EventType["sobbing"] = {
+  panicSign = -1,
+  awkwardSign = 1,
+  callback = function()
+    SoundSfx:play("sobbing_" .. math.random(1, 5))
+  end,
+}
 EventType["light_flickering"] = {
   panicSign = 1,
   awkwardSign = -1,
@@ -68,7 +75,7 @@ EventType["light_flickering"] = {
 }
 
 -- Allowed types for random environmental events
-local randomTypes = {"fart", "scream", "light_flickering", "chuckle"}
+local randomTypes = {"fart", "scream", "light_flickering", "chuckle", "sobbing"}
 
 function EventTypes:getRandomEvent(sender, filter)
   -- TODO: refactor to another method
@@ -77,6 +84,7 @@ function EventTypes:getRandomEvent(sender, filter)
   for k, v in pairs(randomTypes) do
     if v == "scream" and not filter.canScream then
     elseif v == "chuckle" and not filter.canChuckle then
+    elseif v == "sobbing" and not filter.canSob then
     else
       tempRandomTypes[i] = v
       i = i + 1

@@ -7,14 +7,17 @@ SplashScreen.__index = SplashScreen
 
 function SplashScreen:new(o)
   local self = setmetatable(o or {}, SplashScreen)
+  self.foregroundImage = love.graphics.newImage("assets/graphics/main_menu/buttons/loadingbutton.png")
   return self
 end
+
+GameModule = nil
 
 function SplashScreen:update(dt)
   self.accumulatedTime = self.accumulatedTime + dt
   if self.accumulatedTime >= 0.1 and not self.started then
     self.started = true
-    
+
     love.filesystem.load("game.lua")()
     game = Game:new()
 
@@ -25,10 +28,50 @@ function SplashScreen:update(dt)
 end
 
 function SplashScreen:draw()
-  love.graphics.rectangle("fill", 100, 100, love.window:getWidth() - 200, love.window:getHeight() - 200)
-  love.graphics.setColor(0, 0, 0)
-  love.graphics.print("loading...", 150, 150)
+  if self.backgroundImage then
+    love.graphics.draw(self.backgroundImage)
+    love.graphics.draw(self.foregroundImage, self.loadTextX, self.loadTextY, 0, self.foregroundScale)
+  end
 end
+
+function SplashScreen:setBackground(imageData, foregroundScale, startButtonX, startButtonY)
+  self.backgroundImage = love.graphics.newImage(imageData)
+  self.foregroundScale = foregroundScale
+  self.loadTextX = startButtonX
+  self.loadTextY = startButtonY
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -8,12 +8,19 @@ SoundMusic = {
 local MUSIC_VOLUME = 0.25
 
 function SoundMusic:load()
+
   self.sounds[1] = {}
   
   self.sounds[1][1] = love.audio.newSource("assets/sounds/music/ElevatorMusic.wav", "static")
   self.sounds[1][2] = love.audio.newSource("assets/sounds/music/AwkwardMusic1.wav", "static")
   self.sounds[1][3] = love.audio.newSource("assets/sounds/music/AwkwardMusic2.wav", "static")
   self.sounds[1][4] = love.audio.newSource("assets/sounds/music/AwkwardMusic3.wav", "static")
+  
+--  self.sounds[2] = {}
+--  self.sounds[2][1] = love.audio.newSource("assets/sounds/music/PanicMusic1.wav", "static")
+--  self.sounds[2][2] = self.sounds[2][1]
+--  self.sounds[2][3] = love.audio.newSource("assets/sounds/music/PanicMusic2.wav", "static")
+--  self.sounds[2][4] = self.sounds[2][3]
   
   for i = 1, #self.sounds do
     for j = 1, #self.sounds[i] do

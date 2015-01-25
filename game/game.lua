@@ -31,7 +31,7 @@ shaft.scale = elevator.scale
 
 Game = {
   GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
-  MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 5,  -- TODO: change this to 20 (or suitable for gameplay)
+  MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 20,  -- TODO: change this to 20 (or suitable for gameplay)
   START_IDLE_ELEVATOR_FREQ = 5, -- how often the elevators come by in the beginning when idle
   accumulatedGameTime = 0,
   startIdleTime = 0,
@@ -53,6 +53,8 @@ Game = {
   shirtDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet_mask.png"),
   flowerLadySpritesheetImage = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet.png"),
   flowerLadySpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet_mask.png"),
+  beardGuySpritesheetImage = love.graphics.newImage("assets/graphics/sprites/beard_guy_spritesheet.png"),
+  beardGuySpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/beard_guy_spritesheet_mask.png"),
   mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png"),
   mainCharacterFrontsideSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet_mask.png"),
   mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png"),
@@ -161,7 +163,11 @@ local function addSpecialSpriteSheets(game, player)
   -- add the idle "animation"
   local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(game.mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
   player:addAnimation("idle", Animation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, idleAnimationMatrix, scale, quadWidth))
-  player:playAnimation("idle")
+
+  player:mirror()
+  player:playAnimation("panic")
+  player:addPanic(-100)
+  player:addPanic(80)
 
 end
 
@@ -169,6 +175,8 @@ end
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
+  
+  self.GAME_DURATION = (6 + (4 * math.random() - 2)) * 60 -- 4 - 8 minutes of gameplay
 
   gameFinished = GameFinished:new()
   GameState:add("gameFinished", gameFinished)
@@ -198,6 +206,8 @@ function Game:new()
   self.player.inElevator = false
   
   self.buttonList = {}
+  
+  GUI:addLayer("game_gui", true)
 
   GUI:addComponent(createButton(self, "Enter",
   function()
@@ -232,7 +242,7 @@ function Game:createCharacters()
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(550, 250, self.shirtDudeSpritesheetImage, self.shirtDudeSpritesheetImageMask)
+  character = createCharacter(550, 250, self.beardGuySpritesheetImage, self.beardGuySpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 end
@@ -254,37 +264,37 @@ function Game:createGameButtons()
     function()
       sendGlobalEvent(self, "dance")
       game.player:playSpecialAnimation("dance", 3)
-    end))
+    end), "game_gui")
   GUI:addComponent(createButton(self, "Calm down",
     function()
       sendGlobalEvent(self, "calm_down")
       game.player:playSpecialAnimation("calm_down")
-    end))
+    end), "game_gui")
   GUI:addComponent(createButton(self, "Fart",
     function()
       sendGlobalEvent(self, "fart_player")
       game.player:playSpecialAnimation("fart")
       SoundSfx:play("fart_player")
-    end))
+    end), "game_gui")
   GUI:addComponent(createButton(self, "Wave",
     function()
       sendGlobalEvent(self, "wave")
       game.player:playSpecialAnimation("handwave")
-    end))
+    end), "game_gui")
   GUI:addComponent(createButton(self, "Flirt", function()
     sendGlobalEvent(self, "flirt")
     SoundSfx:play("kiss_female_" .. math.random(1, 2))
-  end))
+  end), "game_gui")
   GUI:addComponent(createButton(self, "Tell joke",
     function()
       sendGlobalEvent(self, "tell_joke")
       game.player:playSpecialAnimation("tell_joke", 2)
-    end))
+    end), "game_gui")
   GUI:addComponent(createButton(self, "Irritate",
     function()
       sendGlobalEvent(self, "irritate")
       game.player:playSpecialAnimation("irritate")
-    end))
+    end), "game_gui")
 
   return self
 end
@@ -400,6 +410,8 @@ function Game:update(dt)
     self:gameLoop(dt)
   elseif self.started then
     -- Do END GAME STUFF/Logic
+--    GameState:pop()
+    GUI:layerVisible("game_gui", false)
     GameState:push("gameFinished")
   end
   self:coreLoop(dt)
@@ -423,19 +435,23 @@ function Game:gameLoop(dt)
     self.accTimeBetweenRandomEvents = self.accTimeBetweenRandomEvents + dt
 
     -- TODO: Change 100 to 1000 or 10000 for more seldom events
-    if self.accTimeBetweenRandomEvents > self.MINIMI_TIME_BETWEEN_RANDOM_EVENTS and math.random() < roomMean / 100 then
+    if self.accTimeBetweenRandomEvents > self.MINIMI_TIME_BETWEEN_RANDOM_EVENTS and math.random() < roomMean / 1000 then
       dbg:msg("room mean", roomMean)
 
       local filter = {
         canScream = false,
         canChuckle = false,
+        canSob = false,
       }
       for _, character in ipairs(self.characterList) do
-        if character.panic > 80 then
+        if character.panic > 90 then
           filter.canScream = true
         end
         if character.panic < 40 then
           filter.canChuckle = true
+        end
+        if character.panic > 60 then
+          filter.canSob = true
         end
       end
       local newEvent = EventTypes:getRandomEvent("elevator", filter)
@@ -521,3 +537,5 @@ end
 function Game:flickerLights()
   print("flickering")
 end
+
+return Game
