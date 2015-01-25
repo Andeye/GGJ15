@@ -11,20 +11,20 @@ love.filesystem.load("game_finished.lua")()
 love.filesystem.load("button.lua")()
 love.filesystem.load("utility.lua")()
 
+
 function love.livereload()
-  -- love.load()
+-- love.load()
 end
 
 function love.load()
   print("Resetting")
   GameState:new()
   GUI:new()
-  
+
   game = Game:new()
   gameFinished = GameFinished:new()
-  
-  GameState:add("gameFinished",gameFinished)
   GameState:add("game", game)
+  GameState:add("gameFinished", gameFinished)
   GameState:push("game")
 end
 
