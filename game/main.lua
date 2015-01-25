@@ -18,7 +18,11 @@ function love.load()
   print("Resetting")
   GameState:new()
   GUI:new()
+  
   game = Game:new()
+  gameFinished = GameFinished:new()
+  
+  GameState:add("gameFinished",gameFinished)
   GameState:add("game", game)
   GameState:push("game")
 end
