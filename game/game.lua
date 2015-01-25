@@ -49,6 +49,8 @@ local nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprite
 local nakedDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet_mask.png")
 local shirtDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet.png")
 local shirtDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet_mask.png")
+local flowerLadySpritesheetImage = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet.png")
+local flowerLadySpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet_mask.png")
 local mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png")
 local mainCharacterFrontsideSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet_mask.png")
 local mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png")
@@ -186,7 +188,7 @@ function Game:new()
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(300, 150, nakedDudeSpritesheetImage, nakedDudeSpritesheetImageMask)
+  character = createCharacter(300, 150, flowerLadySpritesheetImage, flowerLadySpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
