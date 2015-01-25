@@ -41,6 +41,7 @@ end
 function Character:moveTo(x, y, z, length)
   length = length or 3
   self.tween = tween.new(length, self, {x=x, y=y, z=z})
+  self.currentAnimationKey = "walk"
 end
 
 function Character:addAwkwardness(da)
@@ -104,9 +105,20 @@ function Character:update(dt)
 
 
   if self.tween then
-    self.tween:update(dt)
+    if self.tween:update(dt) then
+      if self.animations["idle"] ~= nil then
+        self.currentAnimationKey = "idle"
+      else
+        self.currentAnimationKey = "panic"
+      end
+      if self.isMirrored then
+        self:mirror()
+      end
+    end
   end
 
+  dbg:msg("-----------------------------------", "")
+  dbg:msg("currentAnimationKey", self.currentAnimationKey)
   dbg:msg("-----------------------------------", "")
   dbg:msg("character.awkward", self.awkward)
   dbg:msg("character.panic", self.panic)
