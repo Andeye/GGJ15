@@ -139,7 +139,7 @@ local function addSpecialSpriteSheets(game, player)
 
   -- add the special animations
 
-  local totalRows = 3
+  local totalRows = 4
   local quads = 10
   local specialAnimations = {}
   local scale = nil
@@ -150,6 +150,7 @@ local function addSpecialSpriteSheets(game, player)
   player:addSpecialAnimation("handwave", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[1], scale, quadWidth, 100))
   player:addSpecialAnimation("calm_down", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[2], scale, quadWidth, 150))
   player:addSpecialAnimation("fart", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[3], scale, quadWidth, 300))
+  player:addSpecialAnimation("dance", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[4], scale, quadWidth, 200))
 
   -- add the idle "animation"
   local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(game.mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
@@ -210,6 +211,7 @@ function Game:new()
   GUI:addComponent(createButton(self, "Dance",
     function()
       sendGlobalEvent(self, "dance")
+      game.player:playSpecialAnimation("dance")
     end))
   GUI:addComponent(createButton(self, "Calm down",
     function()
