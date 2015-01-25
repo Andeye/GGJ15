@@ -136,7 +136,7 @@ function addSpecialSpriteSheets(player)
     specialAnimations[i], scale, quadWidth = AnimationParser:parseSpecialSpritesheet(mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
   end
   player:addSpecialAnimation("handwave", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[1], scale, quadWidth, 100))
-  player:addSpecialAnimation("calm_down", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[2], scale, quadWidth, 100))
+  player:addSpecialAnimation("calm_down", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[2], scale, quadWidth, 150))
   player:addSpecialAnimation("fart", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, specialAnimations[3], scale, quadWidth, 300))
 
   -- add the idle "animation"
@@ -193,13 +193,19 @@ function Game:new()
   GUI:addComponent(createButton(self, "Calm down",
     function()
       sendGlobalEvent(self, "calm_down")
+      game.player:playSpecialAnimation("calm_down")
     end))
   GUI:addComponent(createButton(self, "Fart",
     function()
       sendGlobalEvent(self, "fart")
+      game.player:playSpecialAnimation("fart")
       SoundSfx:play("fart_male_" .. math.random(1, 3))
     end))
-  GUI:addComponent(createButton(self, "Wave", function() sendGlobalEvent(self, "wave") end))
+  GUI:addComponent(createButton(self, "Wave",
+    function()
+      sendGlobalEvent(self, "wave")
+      game.player:playSpecialAnimation("handwave")
+    end))
   GUI:addComponent(createButton(self, "Flirt", function()
     sendGlobalEvent(self, "flirt")
     SoundSfx:play("kiss_female_" .. math.random(1, 2))
