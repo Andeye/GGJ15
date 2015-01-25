@@ -1,8 +1,10 @@
 GamePrms = {
   size = 25,
 }
-pxlScl = love.window.getPixelScale()
+-- pxlScl = love.window.getPixelScale()
 -- pxlScl = 3
+
+love.filesystem.load("game_finished.lua")()
 
 love.filesystem.load("personality_generator.lua")()
 love.filesystem.load("character.lua")()
@@ -43,19 +45,21 @@ Game = {
   anyButtonClicked = false,
   ACCUMULATED_TIME_LIMIT = 0,
   started = false,
-  skinColorShader = love.graphics.newShader("assets/shaders/skincolor.glsl")
+  skinColorShader = love.graphics.newShader("assets/shaders/skincolor.glsl"),
+  nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png"),
+  nakedDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet_mask.png"),
+  shirtDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet.png"),
+  shirtDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet_mask.png"),
+  flowerLadySpritesheetImage = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet.png"),
+  flowerLadySpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet_mask.png"),
+  mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png"),
+  mainCharacterFrontsideSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet_mask.png"),
+  mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png"),
+  mainCharacterSpecialSpritesheetImage_1_Mask = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1_mask.png"),
 }
 Game.__index = Game
 
 
-local nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
-local nakedDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet_mask.png")
-local shirtDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet.png")
-local shirtDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet_mask.png")
-local mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png")
-local mainCharacterFrontsideSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet_mask.png")
-local mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png")
-local mainCharacterSpecialSpritesheetImage_1_Mask = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1_mask.png")
 
 ---
 -- Temporary function for creating the test character (whitedude)
@@ -105,6 +109,9 @@ local function createButton(game, title, f)
     y = y,
     text = title,
     onClick = function(button)
+      if not game.anyButtonPressed then
+        SoundSfx:play("button_click")
+      end
       buttonUpdate(button, f)
     end, -- eventTrigger,
     mousereleased = function(button)
@@ -138,7 +145,7 @@ local function createButton(game, title, f)
 end
 
 
-function addSpecialSpriteSheets(player)
+local function addSpecialSpriteSheets(game, player)
 
   -- add the special animations
 
@@ -148,15 +155,15 @@ function addSpecialSpriteSheets(player)
   local scale = nil
   local quadWidth = nil
   for i = 1, totalRows do
-    specialAnimations[i], scale, quadWidth = AnimationParser:parseSpecialSpritesheet(mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
+    specialAnimations[i], scale, quadWidth = AnimationParser:parseSpecialSpritesheet(game.mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
   end
-  player:addSpecialAnimation("handwave", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[1], scale, quadWidth, 100))
-  player:addSpecialAnimation("calm_down", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[2], scale, quadWidth, 150))
-  player:addSpecialAnimation("fart", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[3], scale, quadWidth, 300))
+  player:addSpecialAnimation("handwave", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[1], scale, quadWidth, 100))
+  player:addSpecialAnimation("calm_down", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[2], scale, quadWidth, 150))
+  player:addSpecialAnimation("fart", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[3], scale, quadWidth, 300))
 
   -- add the idle "animation"
-  local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
-  player:addAnimation("idle", Animation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, idleAnimationMatrix, scale, quadWidth))
+  local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(game.mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
+  player:addAnimation("idle", Animation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, idleAnimationMatrix, scale, quadWidth))
   player:playAnimation("idle")
 
 end
@@ -165,6 +172,9 @@ end
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
+
+  gameFinished = GameFinished:new()
+  GameState:add("gameFinished", gameFinished)
 
   self.characterList = {}
   self.drawables = {}
@@ -189,8 +199,8 @@ function Game:new()
   -- Create the player
   --
 
-  self.player = createCharacter(400, 350, mainCharacterFrontsideSpritesheetImage, mainCharacterFrontsideSpritesheetImageMask)
-  addSpecialSpriteSheets(self.player)
+  self.player = createCharacter(400, 350, self.mainCharacterFrontsideSpritesheetImage, self.mainCharacterFrontsideSpritesheetImageMask)
+  addSpecialSpriteSheets(self, self.player)
   table.insert(self.drawables, self.player)
 
   self.buttonList = {}
@@ -212,15 +222,15 @@ function Game:new()
 end
 
 function Game:createCharacters()
-  local character = createCharacter(200, 300, shirtDudeSpritesheetImage, shirtDudeSpritesheetImageMask)
+   local character = createCharacter(200, 300, self.shirtDudeSpritesheetImage, self.shirtDudeSpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(300, 150, nakedDudeSpritesheetImage, nakedDudeSpritesheetImageMask)
+  character = createCharacter(300, 150, self.flowerLadySpritesheetImage, self.flowerLadySpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(550, 250, shirtDudeSpritesheetImage, shirtDudeSpritesheetImageMask)
+  character = createCharacter(550, 250, self.shirtDudeSpritesheetImage, self.shirtDudeSpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 end
@@ -417,23 +427,35 @@ function Game:coreLoop(dt)
 end
 
 function Game:startIdleLoop()
-  if elevator.y == -1000 then
-    elevator.y = 1000
-    elevator:moveTo(0)
-  elseif elevator.y == 0 and not elevator.moving then
-    GUI:layerVisible("enter", false)
-    elevator:moveTo(-1000)
-  elseif elevator.y == 0 then
-    GUI:layerVisible("enter", true)
-    self.startIdleTime = 0
+  if not elevator.moving then
+    if elevator.y == -1000 then
+      elevator.y = 1000
+      elevator:moveTo(0)
+      elevator.justMoved = true
+    elseif elevator.y == 0 and elevator.justMoved then
+      GUI:layerVisible("enter", true)
+      self.startIdleTime = 0
+      elevator.justMoved = false
+    elseif elevator.y == 0 then
+      GUI:layerVisible("enter", false)
+      elevator:moveTo(-1000)
+    end
   end
 end
 
 function Game:draw()
   --[[
+
+
   for k,v in pairs(elevator:getDrawables()) do
+
+
     table.insert(self.drawables, v)
+
+
   end
+
+
   --]]
   table.sort(self.drawables, sortZ)
   for k,v in ipairs(self.drawables) do

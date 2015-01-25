@@ -19,6 +19,9 @@ function SoundSfx:load()
     print("  " .. filename)
     self.sounds[filename] = love.audio.newSource(dir .. "/" .. filename .. "." .. extension, "static")
   end
+  
+  -- set specific sound volumes
+  self:setVolume("button_click", .15)
 end
 
 
@@ -39,6 +42,13 @@ end
 function SoundSfx:stop(key)
   if self.sfx[key] then
     self.sfx[key]:stop()
+  end
+end
+
+
+function SoundSfx:setVolume(key, vol)
+  if self.sounds[key] ~= nil then
+    self.sounds[key]:setVolume(vol)
   end
 end
 

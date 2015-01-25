@@ -89,7 +89,7 @@ function Elevator:update(dt)
   end
 
   if self.tween then
-    self.moving = self.tween:update(dt)
+    self.moving = not self.tween:update(dt)
   end
 end
 
