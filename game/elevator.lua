@@ -1,6 +1,7 @@
 ElevatorPrms = {
   elevatorForground = love.graphics.newImage("assets/graphics/elevator/placeholder-fix.png"),
-  elevatorImage = love.graphics.newImage("assets/graphics/elevator/elevator.png"),
+  elevatorFloor = love.graphics.newImage("assets/graphics/elevator/floorandwall.png"),
+  elevatorDoorwall = love.graphics.newImage("assets/graphics/elevator/doorwall.png"),
   leftImage = love.graphics.newImage("assets/graphics/elevator/leftdoor.png"),
   rightImage = love.graphics.newImage("assets/graphics/elevator/rightdoor.png"),
   x = 0,
@@ -31,8 +32,9 @@ Elevator.__index = Elevator
 function Elevator:new(o)
   local self = setmetatable(o or {}, Elevator)
 
-  self.elevatorImage = ElevatorPrms.elevatorImage
-  self.scale = love.window:getHeight() / self.elevatorImage:getHeight()
+  self.elevatorFloor = ElevatorPrms.elevatorFloor
+  self.elevatorDoorwall = ElevatorPrms.elevatorDoorwall
+  self.scale = love.window:getHeight() / self.elevatorFloor:getHeight()
   self.leftImage = ElevatorPrms.leftImage
   self.rightImage = ElevatorPrms.rightImage
   self.x = ElevatorPrms.x
@@ -120,9 +122,18 @@ function Elevator:getDrawables()
       draw=draw,
 			getY=function() return self.y end,
 			getX=function() return self.x end,
-			image=self.elevatorImage,
+			image=self.elevatorFloor,
 			x=self.x,
 			getZ=function() return self.y + 1103 end,
+			0,
+			scale=self.scale
+    }, {
+      draw=draw,
+			getY=function() return self.y end,
+			getX=function() return self.x end,
+			image=self.elevatorDoorwall,
+			x=self.x,
+			getZ=function() return self.y + 1104 end,
 			0,
 			scale=self.scale},
   }
