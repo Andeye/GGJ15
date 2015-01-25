@@ -45,7 +45,41 @@ function AnimationParser:parseCharacter(image)
 
   end
 
-  return walkAnimationMatrix, panicAnimationMatrix, scale
+  return walkAnimationMatrix, panicAnimationMatrix, scale, quadWidth
+end
+
+
+function AnimationParser:parseSpecialSpritesheet(image, row, quads, totalRows)
+  local quadWidth = image:getWidth() / quads
+  local quadHeight = image:getHeight() / totalRows
+
+  local scale = love.window:getHeight() / quadHeight / 2
+  
+  local animationArray = {}
+  
+  for k = 1, quads do
+    animationArray[k] = love.graphics.newQuad((k-1) * quadWidth, (row-1) * quadHeight, quadWidth, quadHeight, image:getDimensions())
+  end
+  
+  return animationArray, scale, quadWidth
+end
+
+
+function AnimationParser:parseIdleAnimation(image, quads, totalRows)
+  local quadWidth = image:getWidth() / quads
+  local quadHeight = image:getHeight() / totalRows
+
+  local scale = love.window:getHeight() / quadHeight / 2
+  
+  local animationMatrix = {}
+  
+  -- assumes that there are exactly four facial impressions (not actually that good :D) 
+  for faceIndex = 1, 4 do
+    animationMatrix[faceIndex] = {}
+    animationMatrix[faceIndex][1] = love.graphics.newQuad(0, 0, quadWidth, quadHeight, image:getDimensions())
+  end
+  
+  return animationMatrix, scale, quadWidth
 end
 
 

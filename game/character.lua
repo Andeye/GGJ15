@@ -2,9 +2,11 @@ CharacterPrms = {}
 
 Character = {
   animations = nil,
+  specialAnimations = nil,
   currentAnimationKey = nil,
-  awkward = 50,
-  panic = 50,
+  currentSpecialAnimationKey = nil,
+  awkward = 10,
+  panic = 10,
   x = 500,
   y = 300,
   personality = nil,
@@ -17,6 +19,9 @@ function Character:new(x, y, personality)
   local self = setmetatable({}, Character)
 
   self.animations = {}
+  self.specialAnimations = {}
+  self.awkward = math.random() * self.awkward
+  self.panic = math.random() * self.panic
   self.x = x or self.x
   self.y = y or self.y
   self.personality = personality
@@ -60,9 +65,40 @@ function getPanicSpriteDuration(panic)
 end
 
 
+function Character:playAnimation(key)
+  if self.animations[key] ~= nil then
+    self.currentAnimationKey = key
+  end
+end
+
+
+function Character:isSpecialAnimationPlaying()
+  local key = self.currentSpecialAnimationKey
+  return key ~= nil and self.specialAnimations[key]:isPlaying()
+end
+
+
+function Character:playSpecialAnimation(key)
+  if not self:isSpecialAnimationPlaying() and self.specialAnimations[key] ~= nil then
+    self.currentSpecialAnimationKey = key
+    self.specialAnimations[key]:play()
+  end
+end
+
+
 function Character:update(dt)
-  local panicSpriteDuration = getPanicSpriteDuration(self.panic)
-  self.animations[self.currentAnimationKey]:update(dt, panicSpriteDuration, self.awkward)
+
+  if self:isSpecialAnimationPlaying() then
+    local key = self.currentSpecialAnimationKey
+    self.specialAnimations[key]:update(dt)
+    if not self.specialAnimations[key]:isPlaying() then
+      self.currentSpecialAnimationKey = nil
+    end
+  else
+    local panicSpriteDuration = getPanicSpriteDuration(self.panic)
+    self.animations[self.currentAnimationKey]:update(dt, panicSpriteDuration, self.awkward)
+  end
+
 
   if self.tween then
     self.tween:update(dt)
@@ -71,13 +107,20 @@ function Character:update(dt)
   dbg:msg("-----------------------------------", "")
   dbg:msg("character.awkward", self.awkward)
   dbg:msg("character.panic", self.panic)
+  
 end
 
 
 function Character:draw()
   local r, g, b = love.graphics.getColor()
   love.graphics.setColor(self.personality.color)
-  self.animations[self.currentAnimationKey]:draw(self.x, self.y)
+  love.graphics.setShader(game.skinColorShader)
+  if self:isSpecialAnimationPlaying() then
+    self.specialAnimations[self.currentSpecialAnimationKey]:draw(self.x, self.y, self.isMirrored)
+  else
+    self.animations[self.currentAnimationKey]:draw(self.x, self.y, self.isMirrored)
+  end
+  love.graphics.setShader()
   love.graphics.setColor(r, g, b)
 end
 
@@ -86,6 +129,14 @@ function Character:addAnimation(key, animation)
   self.animations[key] = animation
   if self.currentAnimationKey == nil then
     self.currentAnimationKey = key
+  end
+end
+
+
+function Character:addSpecialAnimation(key, animation)
+  self.specialAnimations[key] = animation
+  if self.currentSpecialAnimationKey == nil then
+    self.currentSpecialAnimationKey = key
   end
 end
 
@@ -105,8 +156,7 @@ function Character:event(o)
     return
   end
 
-  -- TODO: fix this function pointer in personality
-  local p, a = self.personality.reactToEvent(o)
+  local p, a = self.personality:reactToEvent(o)
 
   self:addAwkwardness(a)
   self:addPanic(p)
@@ -114,4 +164,8 @@ end
 
 function Character:getZ()
   return self.y
+end
+
+function Character:mirror()
+  self.isMirrored = not self.isMirrored
 end

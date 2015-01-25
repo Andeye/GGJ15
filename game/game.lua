@@ -8,6 +8,7 @@ love.filesystem.load("personality_generator.lua")()
 love.filesystem.load("character.lua")()
 love.filesystem.load("elevator.lua")()
 love.filesystem.load("animation.lua")()
+love.filesystem.load("special_animation.lua")()
 love.filesystem.load("animation_parser.lua")()
 
 love.filesystem.load("sound_music.lua")()
@@ -27,27 +28,136 @@ shaft.scale = elevator.scale
 
 
 Game = {
-  player,
-  characterList,
-  drawables,
+  GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
+  MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 5,  -- TODO: change this to 20 (or suitable for gameplay)
+  accumulatedGameTime = 0,
+  accTimeBetweenRandomEvents = 0,
+  player = nil,
+  characterList = nil,
+  drawables = nil,
+  buttonOffsetX = 30,
+  buttonOffsetY = 30,
+  buttonList = nil,
+  anyButtonClicked = false,
+  ACCUMULATED_TIME_LIMIT = 0,
+  skinColorShader = love.graphics.newShader("assets/shaders/skincolor.glsl")
 }
 Game.__index = Game
 
 
 local nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png")
+local nakedDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet_mask.png")
+local shirtDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet.png")
+local shirtDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet_mask.png")
+local mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png")
+local mainCharacterFrontsideSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet_mask.png")
+local mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png")
+local mainCharacterSpecialSpritesheetImage_1_Mask = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1_mask.png")
 
 ---
 -- Temporary function for creating the test character (whitedude)
-local function createCharacter(x, y)
+local function createCharacter(x, y, spritesheetImage, spritesheetMask)
   local character = Character:new(x, y, PersonalityGenerator:createPersonality())
 
-  local walkAnimationMatrix, panicAnimationMatrix, scale = AnimationParser:parseCharacter(nakedDudeSpritesheetImage)
+  local walkAnimationMatrix, panicAnimationMatrix, scale, quadWidth = AnimationParser:parseCharacter(spritesheetImage)
 
-  character:addAnimation("walk", Animation:new(nakedDudeSpritesheetImage, walkAnimationMatrix, scale))
-  character:addAnimation("panic", Animation:new(nakedDudeSpritesheetImage, panicAnimationMatrix, scale))
+  character:addAnimation("walk", Animation:new(spritesheetImage, spritesheetMask, walkAnimationMatrix, scale, quadWidth))
+  character:addAnimation("panic", Animation:new(spritesheetImage, spritesheetMask, panicAnimationMatrix, scale, quadWidth))
 
   return character
 end
+
+local function buttonUpdate(button, f)
+  if button.isDisabled or game.anyButtonPressed then
+    return
+  else
+    f()
+    game.anyButtonPressed = true
+    button.isDisabled = true
+    button:setImageDown()
+  end
+end
+
+
+local function sendGlobalEvent(self, type)
+  print("send global event")
+  local newEvent = EventTypes:getEvent(self.player, type)
+  for i, character in ipairs(self.characterList) do
+    self.characterList[i]:event(newEvent)
+  end
+end
+
+
+
+local function createButton(game, title, f)
+  local x = elevator.x + elevator.elevatorImage:getWidth() * elevator.scale + game.buttonOffsetX
+
+  local y = game.buttonOffsetY
+  if #game.buttonList > 0 then
+    y = game.buttonList[#game.buttonList].y + game.buttonList[#game.buttonList].height + game.buttonOffsetY
+  end
+
+  local button = Button:new{
+    x = x,
+    y = y,
+    text = title,
+    onClick = function(button)
+      buttonUpdate(button, f)
+    end, -- eventTrigger,
+    mousereleased = function(button)
+      if button.isDisabled then
+        return
+      else
+        button.image = button.imageUp
+      end
+    end,
+    accumulatedTime = 0,
+    isDisabled = false,
+    accumulate = function(self, dt)
+      if self.isDisabled then
+        self.accumulatedTime = self.accumulatedTime + dt
+        if self.accumulatedTime >= game.ACCUMULATED_TIME_LIMIT then
+          self.isDisabled = false
+          game.anyButtonPressed = false
+          self:setImageUp()
+          print("enabled")
+          self.accumulatedTime = 0
+        end
+      end
+    end
+  }
+
+  --  buttonUpdate(button, f)
+
+  table.insert(game.buttonList, button)
+
+  return button
+end
+
+
+function addSpecialSpriteSheets(player)
+
+  -- add the special animations
+
+  local totalRows = 3
+  local quads = 10
+  local specialAnimations = {}
+  local scale = nil
+  local quadWidth = nil
+  for i = 1, totalRows do
+    specialAnimations[i], scale, quadWidth = AnimationParser:parseSpecialSpritesheet(mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
+  end
+  player:addSpecialAnimation("handwave", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[1], scale, quadWidth, 100))
+  player:addSpecialAnimation("calm_down", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[2], scale, quadWidth, 150))
+  player:addSpecialAnimation("fart", SpecialAnimation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[3], scale, quadWidth, 300))
+
+  -- add the idle "animation"
+  local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
+  player:addAnimation("idle", Animation:new(mainCharacterSpecialSpritesheetImage_1, mainCharacterSpecialSpritesheetImage_1_Mask, idleAnimationMatrix, scale, quadWidth))
+  player:playAnimation("idle")
+
+end
+
 
 function Game:new()
   local self = setmetatable({}, Game)
@@ -64,27 +174,60 @@ function Game:new()
   SoundMusic:load()
   SoundSfx:load()
 
-  local character = createCharacter(200, 300)
+  --
+  -- create the characters
+  --
+  local character = createCharacter(200, 300, shirtDudeSpritesheetImage, shirtDudeSpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(300, 150)
+  character = createCharacter(300, 150, nakedDudeSpritesheetImage, nakedDudeSpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(550, 250)
+  character = createCharacter(550, 250, shirtDudeSpritesheetImage, shirtDudeSpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
-  
-  player = createCharacter(400, 350)
-  table.insert(self.drawables, player)
-  local button = Button:new{x=800, y=200, text="Call elevator", onClick=function()
-      elevator.y = 1000
-      elevator:moveTo(0)
-    end}
-  GUI:addComponent(button)
-  button = Button:new{x=800, y=300, text="Send elevator", onClick=function() elevator:moveTo(-1000) end}
-  GUI:addComponent(button)
+
+  --
+  -- Create the player
+  --
+
+  self.player = createCharacter(400, 350, mainCharacterFrontsideSpritesheetImage, mainCharacterFrontsideSpritesheetImageMask)
+  addSpecialSpriteSheets(self.player)
+  table.insert(self.drawables, self.player)
+
+  --
+  -- Create buttons
+  --
+
+  self.buttonList = {}
+  GUI:addComponent(createButton(self, "Dance",
+    function()
+      sendGlobalEvent(self, "dance")
+    end))
+  GUI:addComponent(createButton(self, "Calm down",
+    function()
+      sendGlobalEvent(self, "calm_down")
+      game.player:playSpecialAnimation("calm_down")
+    end))
+  GUI:addComponent(createButton(self, "Fart",
+    function()
+      sendGlobalEvent(self, "fart")
+      game.player:playSpecialAnimation("fart")
+      SoundSfx:play("fart_male_" .. math.random(1, 3))
+    end))
+  GUI:addComponent(createButton(self, "Wave",
+    function()
+      sendGlobalEvent(self, "wave")
+      game.player:playSpecialAnimation("handwave")
+    end))
+  GUI:addComponent(createButton(self, "Flirt", function()
+    sendGlobalEvent(self, "flirt")
+    SoundSfx:play("kiss_female_" .. math.random(1, 2))
+  end))
+  GUI:addComponent(createButton(self, "Tell joke", function() sendGlobalEvent(self, "tell_joke") end))
+  GUI:addComponent(createButton(self, "Irritate", function() sendGlobalEvent(self, "irritate") end))
 
   return self
 end
@@ -106,15 +249,23 @@ function love.keypressed(key)
     game.characterList[1]:addPanic(-5)
   elseif key == "4" then
     game.characterList[1]:addPanic(5)
+  elseif key == "8" then
+    game.player:playSpecialAnimation("fart")
+  elseif key == "9" then
+    game.player:playSpecialAnimation("handwave")
+  elseif key == "0" then
+    game.player:playSpecialAnimation("calm_down")
   elseif key == "f" then
     SoundSfx:play("fart")
+  elseif key == "m" then
+    game.player:mirror()
   elseif key == "e" then
-    local newEvent = EventTypes:getEvent(player, "dance")
+    local newEvent = EventTypes:getEvent(game.player, "dance")
     for i, character in ipairs(game.characterList) do
       game.characterList[i]:event(newEvent)
     end
   elseif key == "r" then
-    local newEvent = EventTypes:getEvent(player, "calm_down")
+    local newEvent = EventTypes:getEvent(self.player, "calm_down")
     for i, character in ipairs(game.characterList) do
       game.characterList[i]:event(newEvent)
     end
@@ -123,19 +274,19 @@ end
 
 local function input(dt)
   if love.keyboard.isDown("w") then
-    player:move(0, -100 * dt * 0.47)
+    game.player:move(0, -100 * dt * 0.47)
   end
   if love.keyboard.isDown("s") then
-    player:move(0, 100 * dt * 0.47)
+    game.player:move(0, 100 * dt * 0.47)
   end
   if love.keyboard.isDown("a") then
-    player:move(-100 * dt, 0)
+    game.player:move(-100 * dt, 0)
   end
   if love.keyboard.isDown("d") then
-    player:move(100 * dt, 0)
+    game.player:move(100 * dt, 0)
   end
   if love.keyboard.isDown("t") then
-    player:moveTo(200, -100)
+    game.player:moveTo(200, -100)
   end
   if love.keyboard.isDown("r") then
     elevator.y = 1000
@@ -159,25 +310,62 @@ local function getRoomStatus(game)
 end
 
 function Game:update(dt)
-
   dbg:msg("Game ID", tostring(self.selected))
+  dbg:msg("Game time", self.accumulatedGameTime)
+  dbg:msg("Game Ends", self.GAME_DURATION)
 
-  input(dt)
+  self.accumulatedGameTime = self.accumulatedGameTime + dt
 
-  player:update(dt)
+  if self.accumulatedGameTime < self.GAME_DURATION then
+    input(dt)
 
-  elevator:update(dt)
-  for _, character in ipairs(self.characterList) do
-    character:update(dt)
+    self.player:update(dt)
+
+    elevator:update(dt)
+    for _, character in ipairs(self.characterList) do
+      character:update(dt)
+    end
+
+    local roomPanic, roomAwkwardness = getRoomStatus(self)
+    local roomMean = (roomPanic + roomAwkwardness) / 2
+    self.accTimeBetweenRandomEvents = self.accTimeBetweenRandomEvents + dt
+
+    -- TODO: Change 100 to 1000 or 10000 for more seldom events
+    if self.accTimeBetweenRandomEvents > self.MINIMI_TIME_BETWEEN_RANDOM_EVENTS and math.random() < roomMean / 100 then
+      dbg:msg("room mean", roomMean)
+
+      local filter = {
+        canScream = false,
+        canChuckle = false,
+      }
+      for _, character in ipairs(self.characterList) do
+        if character.panic > 80 then
+          filter.canScream = true
+        end
+        if character.panic < 40 then
+          filter.canChuckle = true
+        end
+      end
+      local newEvent = EventTypes:getRandomEvent("elevator", filter)
+      for _, character in ipairs(self.characterList) do
+        character:event(newEvent)
+      end
+      self.accTimeBetweenRandomEvents = 0
+    end
+
+    for _, button in ipairs(self.buttonList) do
+      button:accumulate(dt)
+    end
+
+    dbg:msg("---------------------------", "")
+    dbg:msg("roomPanic", roomPanic)
+    dbg:msg("roomAwkwardness", roomAwkwardness)
+
+    SoundMusic:update(dt, roomPanic, roomAwkwardness)
+  else
+    -- Do END GAME STUFF/Logic
+    GameState:push("gameFinished")
   end
-
-  local roomPanic, roomAwkwardness = getRoomStatus(self)
-  
-  dbg:msg("---------------------------", "")
-  dbg:msg("roomPanic", roomPanic)
-  dbg:msg("roomAwkwardness", roomAwkwardness)
-
-  SoundMusic:update(dt, roomPanic, roomAwkwardness)
 end
 
 function Game:draw()
@@ -198,4 +386,8 @@ function sortZ(a, b)
   -- print("b")
   -- print(dbg:serialize(b))
   return a:getZ() < b:getZ()
+end
+
+function Game:flickerLights()
+  print("flickering")
 end

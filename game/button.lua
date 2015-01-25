@@ -59,6 +59,14 @@ function Button:onBlur(onDrag, draggable)
   --]]
 end
 
+function Button:setImageUp()
+  self.image = self.imageUp
+end
+
+function Button:setImageDown()
+  self.image = self.imageDown
+end
+
 function Button:mousepressed()
   self.image = self.imageDown
 end

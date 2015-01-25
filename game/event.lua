@@ -12,13 +12,13 @@ Event.__index = Event
 
 ---
 -- sender is the object that triggered the event
--- 
-function Event:new(sender, type, panicValue, awkwardValue)
+--
+function Event:new(sender, type, callback, panicValue, awkwardValue)
   local self = setmetatable({}, Event)
 
   self.sender = sender
   self.type = type
-  
+
   if panicValue ~= nil and awkwardValue == nil then
     self.panicValue = panicValue
     self.awkwardValue = panicValue
@@ -27,13 +27,10 @@ function Event:new(sender, type, panicValue, awkwardValue)
   self.panicValue = panicValue or self.panicValue
   self.awkwardValue = awkwardValue or self.awkwardValue
 
-  print("--------------------------")
-  print("event.sender       = " .. dbg:serialize(self.sender))
-  print("event.type         = " .. self.type)
-  print("event.panicValue   = " .. self.panicValue)
-  print("event.awkwardValue = " .. self.awkwardValue)
-  print("--------------------------")
-    
+  if callback then
+    callback()
+  end
+
   return self
 end
 

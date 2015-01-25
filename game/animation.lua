@@ -3,21 +3,25 @@ AnimationPrms = {
 
 Animation = {
   spriteSheet = nil,
+  spriteMask = nil,
   spriteMatrix = nil,
+  quadWidth = 0,
   currentQuadIndex = 1,
   currentFaceIndex = 1,
   currentTime = 0,
-  scale = 1
+  scale = 1,
 }
 Animation.__index = Animation
 
 
-function Animation:new(spriteSheetImage, spriteMatrix, scale)
+function Animation:new(spriteSheetImage, spriteSheetMask, spriteMatrix, scale, quadWidth)
   local self = setmetatable({}, Animation)
 
   self.spriteSheet = spriteSheetImage
+  self.spriteMask = spriteSheetMask
   self.spriteMatrix = spriteMatrix
   self.scale = scale or self.scale
+  self.quadWidth = quadWidth
 
   return self
 end
@@ -43,6 +47,13 @@ function Animation:update(dt, spriteDuration, awkwardness)
 end
 
 
-function Animation:draw(x, y)
-  love.graphics.draw(self.spriteSheet, self.spriteMatrix[self.currentFaceIndex][self.currentQuadIndex], x, y, 0, self.scale)
+function Animation:draw(x, y, isMirrored)
+  if self.spriteMask ~= nil then
+    game.skinColorShader:send("skinMask", self.spriteMask)
+  end
+  if not isMirrored then
+    love.graphics.draw(self.spriteSheet, self.spriteMatrix[self.currentFaceIndex][self.currentQuadIndex], x, y, 0, self.scale)
+  else
+    love.graphics.draw(self.spriteSheet, self.spriteMatrix[self.currentFaceIndex][self.currentQuadIndex], x + self.quadWidth / 2, y, 0, -self.scale, self.scale)
+  end
 end
