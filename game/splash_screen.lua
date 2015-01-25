@@ -11,12 +11,15 @@ function SplashScreen:new(o)
   return self
 end
 
+GameModule = nil
+
 function SplashScreen:update(dt)
   self.accumulatedTime = self.accumulatedTime + dt
   if self.accumulatedTime >= 0.1 and not self.started then
     self.started = true
-
-    love.filesystem.load("game.lua")()
+    
+    GameModule = nil
+    GameModule = love.filesystem.load("game.lua")()
     game = Game:new()
 
     GameState:add("game", game)
@@ -37,7 +40,17 @@ function SplashScreen:setBackground(imageData, foregroundScale, startButtonX, st
   self.foregroundScale = foregroundScale
   self.loadTextX = startButtonX
   self.loadTextY = startButtonY
+  self.started = false
+  self.accumulatedTime = 0
 end
+
+
+
+
+
+
+
+
 
 
 

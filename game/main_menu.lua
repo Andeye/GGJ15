@@ -117,6 +117,7 @@ function MainMenu:update(dt)
   if self.buttons.quit.pressed then
     self.timer = self.timer + dt
     if self.timer >= 0.5 then
+      self.buttons.quit.pressed = false
       quitGame(self)
     end
   end
@@ -124,6 +125,7 @@ function MainMenu:update(dt)
   if self.buttons.start.pressed then
     self.timer = self.timer + dt
     if self.timer >= 0.05 then
+      self.buttons.start.pressed = false
       startGame(self)
     end
   end
