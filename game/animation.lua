@@ -3,6 +3,7 @@ AnimationPrms = {
 
 Animation = {
   spriteSheet = nil,
+  spriteMask = nil,
   spriteMatrix = nil,
   quadWidth = 0,
   currentQuadIndex = 1,
@@ -13,10 +14,11 @@ Animation = {
 Animation.__index = Animation
 
 
-function Animation:new(spriteSheetImage, spriteMatrix, scale, quadWidth)
+function Animation:new(spriteSheetImage, spriteSheetMask, spriteMatrix, scale, quadWidth)
   local self = setmetatable({}, Animation)
 
   self.spriteSheet = spriteSheetImage
+  self.spriteMask = spriteSheetMask
   self.spriteMatrix = spriteMatrix
   self.scale = scale or self.scale
   self.quadWidth = quadWidth
@@ -46,6 +48,9 @@ end
 
 
 function Animation:draw(x, y, isMirrored)
+  if self.spriteMask ~= nil then
+    game.skinColorShader:send("skinMask", self.spriteMask)
+  end
   if not isMirrored then
     love.graphics.draw(self.spriteSheet, self.spriteMatrix[self.currentFaceIndex][self.currentQuadIndex], x, y, 0, self.scale)
   else

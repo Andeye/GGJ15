@@ -1,6 +1,7 @@
 
 SpecialAnimation = {
   spriteSheet = nil,
+  spriteMask = nil,
   spriteArray = nil,
   quadWidth = nil,
   currentQuadIndex = nil,
@@ -11,10 +12,11 @@ SpecialAnimation = {
 SpecialAnimation.__index = SpecialAnimation
 
 
-function SpecialAnimation:new(spriteSheetImage, spriteArray, scale, quadWidth, duration)
+function SpecialAnimation:new(spriteSheetImage, spriteSheetMask, spriteArray, scale, quadWidth, duration)
   local self = setmetatable({}, SpecialAnimation)
 
   self.spriteSheet = spriteSheetImage
+  self.spriteMask = spriteSheetMask
   self.spriteArray = spriteArray
   self.scale = scale or self.scale
   self.quadWidth = quadWidth
@@ -55,6 +57,9 @@ end
 
 
 function SpecialAnimation:draw(x, y, isMirrored)
+  if self.spriteMask ~= nil then
+    game.skinColorShader:send("skinMask", self.spriteMask)
+  end
   if not isMirrored then
     love.graphics.draw(self.spriteSheet, self.spriteArray[self.currentQuadIndex], x, y, 0, self.scale)
   else
