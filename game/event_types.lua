@@ -66,16 +66,16 @@ EventType["sobbing"] = {
     SoundSfx:play("sobbing_" .. math.random(1, 5))
   end,
 }
-EventType["light_flickering"] = {
+EventType["elevator_sound"] = {
   panicSign = 1,
   awkwardSign = -1,
   callback = function()
-    game:flickerLights()
+    SoundSfx:play("elevator_crash_" .. math.random(1, 2))
   end,
 }
 
 -- Allowed types for random environmental events
-local randomTypes = {"fart", "scream", "light_flickering", "chuckle", "sobbing"}
+local randomTypes = {"fart", "scream", "elevator_sound", "chuckle", "sobbing"}
 
 function EventTypes:getRandomEvent(sender, filter)
   -- TODO: refactor to another method
