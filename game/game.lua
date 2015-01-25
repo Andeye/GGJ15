@@ -347,13 +347,17 @@ function Game:update(dt)
       local filter = {
         canScream = false,
         canChuckle = false,
+        canSob = false,
       }
       for _, character in ipairs(self.characterList) do
-        if character.panic > 80 then
+        if character.panic > 90 then
           filter.canScream = true
         end
         if character.panic < 40 then
           filter.canChuckle = true
+        end
+        if character.panic > 60 then
+          filter.canSob = true
         end
       end
       local newEvent = EventTypes:getRandomEvent("elevator", filter)
