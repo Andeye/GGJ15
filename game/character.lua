@@ -5,8 +5,8 @@ Character = {
   specialAnimations = nil,
   currentAnimationKey = nil,
   currentSpecialAnimationKey = nil,
-  awkward = 50,
-  panic = 50,
+  awkward = 10,
+  panic = 10,
   x = 500,
   y = 300,
   personality = nil,
@@ -20,6 +20,8 @@ function Character:new(x, y, personality)
 
   self.animations = {}
   self.specialAnimations = {}
+  self.awkward = math.random() * self.awkward
+  self.panic = math.random() * self.panic
   self.x = x or self.x
   self.y = y or self.y
   self.personality = personality

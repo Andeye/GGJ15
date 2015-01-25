@@ -21,9 +21,16 @@ local elevator = Elevator:new()
 
 
 Game = {
+  GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
+  accumulatedGameTime = 0,
   player = nil,
   characterList = nil,
   drawables = nil,
+  buttonOffsetX = 30,
+  buttonOffsetY = 30,
+  buttonList = nil,
+  anyButtonClicked = false,
+  ACCUMULATED_TIME_LIMIT = 4,
 }
 Game.__index = Game
 
@@ -45,26 +52,69 @@ local function createCharacter(x, y, spritesheetImage)
   return character
 end
 
-local buttonOffsetX = 30
-local buttonOffsetY = 30
-local buttonList = {}
-
-local function createButton(title, eventTrigger)
-  local x = elevator.x + elevator.elevatorImage:getWidth() * elevator.scale + buttonOffsetX
-  
-  local y = buttonOffsetY
-  if #buttonList > 0 then
-    y = buttonList[#buttonList].y + buttonList[#buttonList].height + buttonOffsetY
+local function buttonUpdate(button, f)
+  if button.isDisabled or game.anyButtonPressed then
+    return
+  else
+    f()
+    game.anyButtonPressed = true
+    button.isDisabled = true
+    button:setImageDown()
   end
-  
+end
+
+
+local function sendGlobalEvent(self, type)
+  print("send global event")
+  local newEvent = EventTypes:getEvent(self.player, type)
+  for i, character in ipairs(self.characterList) do
+    self.characterList[i]:event(newEvent)
+  end
+end
+
+
+
+local function createButton(game, title, f)
+  local x = elevator.x + elevator.elevatorImage:getWidth() * elevator.scale + game.buttonOffsetX
+
+  local y = game.buttonOffsetY
+  if #game.buttonList > 0 then
+    y = game.buttonList[#game.buttonList].y + game.buttonList[#game.buttonList].height + game.buttonOffsetY
+  end
+
   local button = Button:new{
     x = x,
     y = y,
     text = title,
-    onClick = eventTrigger
+    onClick = function(button)
+      buttonUpdate(button, f)
+    end, -- eventTrigger,
+    mousereleased = function(button)
+      if button.isDisabled then
+        return
+      else
+        button.image = button.imageUp
+      end
+    end,
+    accumulatedTime = 0,
+    isDisabled = false,
+    accumulate = function(self, dt)
+      if self.isDisabled then
+        self.accumulatedTime = self.accumulatedTime + dt
+        if self.accumulatedTime >= game.ACCUMULATED_TIME_LIMIT then
+          self.isDisabled = false
+          game.anyButtonPressed = false
+          self:setImageUp()
+          print("enabled")
+          self.accumulatedTime = 0
+        end
+      end
+    end
   }
 
-  table.insert(buttonList, button)
+  --  buttonUpdate(button, f)
+  
+  table.insert(game.buttonList, button)
 
   return button
 end
@@ -132,18 +182,28 @@ function Game:new()
   -- Create buttons
   --]]
 
-  GUI:addComponent(createButton("Dance", function()
-    local newEvent = EventTypes:getEvent(self.player, "dance")
-    for i, character in ipairs(self.characterList) do
-      self.characterList[i]:event(newEvent)
-    end
+
+  self.buttonList = {}
+  GUI:addComponent(createButton(self, "Dance",
+    function()
+      sendGlobalEvent(self, "dance")
+    end))
+  GUI:addComponent(createButton(self, "Calm down",
+    function()
+      sendGlobalEvent(self, "calm_down")
+    end))
+  GUI:addComponent(createButton(self, "Fart",
+    function()
+      sendGlobalEvent(self, "fart")
+      SoundSfx:play("fart_male_" .. math.random(1, 3))
+    end))
+  GUI:addComponent(createButton(self, "Wave", function() sendGlobalEvent(self, "wave") end))
+  GUI:addComponent(createButton(self, "Flirt", function()
+    sendGlobalEvent(self, "flirt")
+    SoundSfx:play("kiss_female_" .. math.random(1, 2))
   end))
-  GUI:addComponent(createButton("Calm down", function()
-    local newEvent = EventTypes:getEvent(self.player, "calm_down")
-    for i, character in ipairs(self.characterList) do
-      self.characterList[i]:event(newEvent)
-    end
-  end))
+  GUI:addComponent(createButton(self, "Tell joke", function() sendGlobalEvent(self, "tell_joke") end))
+  GUI:addComponent(createButton(self, "Irritate", function() sendGlobalEvent(self, "irritate") end))
 
   return self
 end
@@ -228,23 +288,35 @@ end
 function Game:update(dt)
 
   dbg:msg("Game ID", tostring(self.selected))
+  dbg:msg("Game time", self.accumulatedGameTime)
+  dbg:msg("Game Ends", self.GAME_DURATION)
 
-  input(dt)
+  self.accumulatedGameTime = self.accumulatedGameTime + dt
 
-  self.player:update(dt)
+  if self.accumulatedGameTime < self.GAME_DURATION then
+    input(dt)
 
-  elevator:update(dt)
-  for _, character in ipairs(self.characterList) do
-    character:update(dt)
+    self.player:update(dt)
+
+    elevator:update(dt)
+    for _, character in ipairs(self.characterList) do
+      character:update(dt)
+    end
+
+    local roomPanic, roomAwkwardness = getRoomStatus(self)
+
+    for _, button in ipairs(self.buttonList) do
+      button:accumulate(dt)
+    end
+
+    dbg:msg("---------------------------", "")
+    dbg:msg("roomPanic", roomPanic)
+    dbg:msg("roomAwkwardness", roomAwkwardness)
+
+    SoundMusic:update(dt, roomPanic, roomAwkwardness)
+  else
+  -- Do END GAME STUFF/Logic
   end
-
-  local roomPanic, roomAwkwardness = getRoomStatus(self)
-
-  dbg:msg("---------------------------", "")
-  dbg:msg("roomPanic", roomPanic)
-  dbg:msg("roomAwkwardness", roomAwkwardness)
-
-  SoundMusic:update(dt, roomPanic, roomAwkwardness)
 end
 
 function Game:draw()
