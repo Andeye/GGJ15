@@ -20,9 +20,9 @@ function love.load()
   GUI:new()
   
   game = Game:new()
-  gameFinished = GameFinished:new()
-  
-  GameState:add("gameFinished",gameFinished)
+--  gameFinished = GameFinished:new()
+--  
+--  GameState:add("gameFinished",gameFinished)
   GameState:add("game", game)
   GameState:push("game")
 end

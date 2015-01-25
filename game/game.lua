@@ -17,6 +17,7 @@ love.filesystem.load("sound_sfx.lua")()
 love.filesystem.load("event_types.lua")()
 love.filesystem.load("event.lua")()
 
+
 local elevator = Elevator:new()
 
 
@@ -33,6 +34,7 @@ Game = {
   buttonList = nil,
   anyButtonClicked = false,
   ACCUMULATED_TIME_LIMIT = 0,
+  skinColorShader = love.graphics.newShader("assets/shaders/skincolor.glsl")
 }
 Game.__index = Game
 
@@ -294,7 +296,6 @@ local function getRoomStatus(game)
 end
 
 function Game:update(dt)
-
   dbg:msg("Game ID", tostring(self.selected))
   dbg:msg("Game time", self.accumulatedGameTime)
   dbg:msg("Game Ends", self.GAME_DURATION)

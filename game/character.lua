@@ -114,11 +114,13 @@ end
 function Character:draw()
   local r, g, b = love.graphics.getColor()
   love.graphics.setColor(self.personality.color)
+  love.graphics.setShader(game.skinColorShader)
   if self:isSpecialAnimationPlaying() then
     self.specialAnimations[self.currentSpecialAnimationKey]:draw(self.x, self.y, self.isMirrored)
   else
     self.animations[self.currentAnimationKey]:draw(self.x, self.y, self.isMirrored)
   end
+  love.graphics.setShader()
   love.graphics.setColor(r, g, b)
 end
 
