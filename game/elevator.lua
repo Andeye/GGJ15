@@ -5,7 +5,7 @@ ElevatorPrms = {
   leftImage = love.graphics.newImage("assets/graphics/elevator/leftdoor.png"),
   rightImage = love.graphics.newImage("assets/graphics/elevator/rightdoor.png"),
   x = 0,
-  y = 0,
+  y = 1000,
   tween,
 }
 
@@ -25,9 +25,17 @@ Elevator = {
   doorOffset = MIN_DOOR_OFFSET,
   currentDoorState = DOOR_STATES.CLOSED,
   moving = false,
+  justMoved = true,
 }
 Elevator.__index = Elevator
 
+function Elevator:isDoorOpen()
+  return self.currentDoorState == DOOR_STATES.OPEN
+end
+
+function Elevator:isDoorClosed()
+  return self.currentDoorState == DOOR_STATES.CLOSED
+end
 
 function Elevator:new(o)
   local self = setmetatable(o or {}, Elevator)
@@ -66,6 +74,7 @@ end
 
 
 function Elevator:openDoors()
+print("asdasdasdasdasdasdas")
   if self.currentDoorState == DOOR_STATES.CLOSED then
     SoundSfx:play("ding")
   end

@@ -32,7 +32,7 @@ shaft.scale = elevator.scale
 Game = {
   GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
   MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 5,  -- TODO: change this to 20 (or suitable for gameplay)
-  START_IDLE_ELEVATOR_FREQ = 3, -- how often the elevators come by in the beginning when idle
+  START_IDLE_ELEVATOR_FREQ = 5, -- how often the elevators come by in the beginning when idle
   accumulatedGameTime = 0,
   startIdleTime = 0,
   accTimeBetweenRandomEvents = 0,
@@ -195,6 +195,7 @@ function Game:new()
   table.insert(self.drawables, self.player)
 
   self.player.z = 840
+  self.player.inElevator = false
   
   self.buttonList = {}
 
@@ -208,7 +209,11 @@ function Game:new()
 
     self.player.inElevator = true
     self.player:moveTo(350, 400, 1000, length)
+    elevator:closeDoors()
   end), "enter")
+  GUI:layerVisible("enter", false)
+
+  elevator:moveTo(0)
 
   --
   -- Create buttons
@@ -370,6 +375,7 @@ function Game:update(dt)
     self.accumulatedGameTime = self.accumulatedGameTime + dt
   else
     self.startIdleTime = self.startIdleTime + dt
+    self:idleLoop()
   end
 
   dbg:msg("startIdleTime", self.startIdleTime)
@@ -378,6 +384,17 @@ function Game:update(dt)
   if self.startIdleTime > self.START_IDLE_ELEVATOR_FREQ then
     self:startIdleLoop()
   end
+  --[[
+  if self.startIdleTime > self.START_IDLE_ELEVATOR_FREQ then
+    if not elevator.moving then
+      if elevator:isDoorOpen() then
+        elevator:closeDoors()
+      elseif elevator:isDoorClosed() then
+        elevator:moveTo(-1000)
+      end
+    end
+  end
+  --]]
   
   if self.started and self.accumulatedGameTime < self.GAME_DURATION then
     self:gameLoop(dt)
@@ -439,20 +456,35 @@ function Game:gameLoop(dt)
     SoundMusic:update(dt, roomPanic, roomAwkwardness)
 end
 
-function Game:startIdleLoop()
+function Game:idleLoop()
   if not elevator.moving then
     if elevator.y == -1000 then
+      print("1")
       elevator.y = 1000
       elevator:moveTo(0)
-      elevator.justMoved = true
+      elevator.moving = true
       self:removeCharacters()
-    elseif elevator.y == 0 and elevator.justMoved then
-      GUI:layerVisible("enter", true)
+    elseif elevator.y == 0 and elevator:isDoorClosed() and #self.characterList == 0 then
+      print("2")
+      elevator:openDoors()
       self.startIdleTime = 0
-      elevator.justMoved = false
+    elseif elevator.y == 0 and elevator:isDoorOpen() and #self.characterList == 0 then
+      print("3")
+      self.startIdleTime = 0
+      GUI:layerVisible("enter", true)
       self:createCharacters()
-    elseif elevator.y == 0 then
+    end
+  end
+end
+
+function Game:startIdleLoop()
+  if not elevator.moving then
+    if elevator:isDoorOpen() then
+      print("4")
+      elevator:closeDoors()
       GUI:layerVisible("enter", false)
+    elseif elevator:isDoorClosed() then
+      print("5")
       elevator:moveTo(-1000)
     end
   end
