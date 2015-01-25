@@ -12,6 +12,10 @@ EventType["fart"] = {
   awkwardSign = 1,
   callback = function() SoundSfx:play("fart_male_" .. math.random(1, 3)) end
 }
+EventType["fart_player"] = {
+  panicSign = 1,
+  awkwardSign = 1,
+}
 EventType["wave"] = {
   panicSign = -1,
   awkwardSign = 1,

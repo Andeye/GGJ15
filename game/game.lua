@@ -79,10 +79,10 @@ local function buttonUpdate(button, f)
   if button.isDisabled or game.anyButtonPressed then
     return
   else
-    f()
     game.anyButtonPressed = true
     button.isDisabled = true
     button:setLitUp(true)
+    f()
   end
 end
 
@@ -143,7 +143,7 @@ local function addSpecialSpriteSheets(game, player)
 
   -- add the special animations
 
-  local totalRows = 4
+  local totalRows = 6
   local quads = 10
   local specialAnimations = {}
   local scale = nil
@@ -151,10 +151,12 @@ local function addSpecialSpriteSheets(game, player)
   for i = 1, totalRows do
     specialAnimations[i], scale, quadWidth = AnimationParser:parseSpecialSpritesheet(game.mainCharacterSpecialSpritesheetImage_1, i, quads, totalRows)
   end
-  player:addSpecialAnimation("handwave", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[1], scale, quadWidth, 100))
-  player:addSpecialAnimation("calm_down", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[2], scale, quadWidth, 150))
-  player:addSpecialAnimation("fart", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[3], scale, quadWidth, 300))
-  player:addSpecialAnimation("dance", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[4], scale, quadWidth, 120))
+  player:addSpecialAnimation("tell_joke", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[1], scale, quadWidth, 150))
+  player:addSpecialAnimation("irritate", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[2], scale, quadWidth, 200))
+  player:addSpecialAnimation("dance", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[3], scale, quadWidth, 100))
+  player:addSpecialAnimation("fart", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[4], scale, quadWidth, 300))
+  player:addSpecialAnimation("calm_down", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[5], scale, quadWidth, 150))
+  player:addSpecialAnimation("handwave", SpecialAnimation:new(game.mainCharacterSpecialSpritesheetImage_1, game.mainCharacterSpecialSpritesheetImage_1_Mask, specialAnimations[6], scale, quadWidth, 100))
 
   -- add the idle "animation"
   local idleAnimationMatrix, scale, quadwidth = AnimationParser:parseIdleAnimation(game.mainCharacterSpecialSpritesheetImage_1, quads, totalRows)
@@ -202,6 +204,7 @@ function Game:new()
     self.buttonList = {}
     self:createGameButtons()
     self.started = true
+    game.anyButtonPressed = false
 
     self.player.inElevator = true
     self.player:moveTo(350, 400, 1000, length)
@@ -254,9 +257,9 @@ function Game:createGameButtons()
     end))
   GUI:addComponent(createButton(self, "Fart",
     function()
-      sendGlobalEvent(self, "fart")
+      sendGlobalEvent(self, "fart_player")
       game.player:playSpecialAnimation("fart")
-      SoundSfx:play("fart_male_" .. math.random(1, 3))
+      SoundSfx:play("fart_player")
     end))
   GUI:addComponent(createButton(self, "Wave",
     function()
@@ -267,8 +270,16 @@ function Game:createGameButtons()
     sendGlobalEvent(self, "flirt")
     SoundSfx:play("kiss_female_" .. math.random(1, 2))
   end))
-  GUI:addComponent(createButton(self, "Tell joke", function() sendGlobalEvent(self, "tell_joke") end))
-  GUI:addComponent(createButton(self, "Irritate", function() sendGlobalEvent(self, "irritate") end))
+  GUI:addComponent(createButton(self, "Tell joke",
+    function()
+      sendGlobalEvent(self, "tell_joke")
+      game.player:playSpecialAnimation("tell_joke", 2)
+    end))
+  GUI:addComponent(createButton(self, "Irritate",
+    function()
+      sendGlobalEvent(self, "irritate")
+      game.player:playSpecialAnimation("irritate")
+    end))
 
   return self
 end
