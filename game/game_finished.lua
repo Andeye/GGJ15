@@ -10,4 +10,12 @@ function GameFinished:new(o)
 end
 
 
+function GameFinished:update(dt)
+end
+
+function GameFinished:draw()
+  love.graphics.rectangle("fill", 100, 100, love.window:getWidth() - 200, love.window:getHeight() - 200)
+end
+
+
 return GameFinished

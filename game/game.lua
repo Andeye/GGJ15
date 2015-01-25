@@ -320,6 +320,7 @@ function Game:update(dt)
     local roomMean = (roomPanic + roomAwkwardness) / 2
     self.accTimeBetweenRandomEvents = self.accTimeBetweenRandomEvents + dt
 
+    -- TODO: Change 100 to 1000 or 10000 for more seldom events
     if self.accTimeBetweenRandomEvents > self.MINIMI_TIME_BETWEEN_RANDOM_EVENTS and math.random() < roomMean / 100 then
       dbg:msg("room mean", roomMean)
 
@@ -352,7 +353,8 @@ function Game:update(dt)
 
     SoundMusic:update(dt, roomPanic, roomAwkwardness)
   else
-  -- Do END GAME STUFF/Logic
+    -- Do END GAME STUFF/Logic
+    GameState:push("gameFinished")
   end
 end
 

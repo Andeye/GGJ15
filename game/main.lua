@@ -7,6 +7,7 @@ dbg = Debug:new()
 love.filesystem.load("gamestate.lua")()
 love.filesystem.load("gui.lua")()
 love.filesystem.load("game.lua")()
+love.filesystem.load("game_finished.lua")()
 love.filesystem.load("button.lua")()
 love.filesystem.load("utility.lua")()
 
@@ -20,9 +21,9 @@ function love.load()
   GUI:new()
   
   game = Game:new()
---  gameFinished = GameFinished:new()
---  
---  GameState:add("gameFinished",gameFinished)
+  gameFinished = GameFinished:new()
+  
+  GameState:add("gameFinished",gameFinished)
   GameState:add("game", game)
   GameState:push("game")
 end
