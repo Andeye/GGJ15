@@ -1,8 +1,14 @@
 Button = {
   width=200,
   height=50,
-  imageUp=love.graphics.newImage("assets/graphics/placeholderout.png"),
-  imageDown=love.graphics.newImage("assets/graphics/placeholderin.png"),
+  imageUp = {
+    [false] = love.graphics.newImage("assets/graphics/buttons/placeholderout.png"),
+    [true] = love.graphics.newImage("assets/graphics/buttons/buttonlightfullout.png")
+  },
+  imageDown = {
+    [false] = love.graphics.newImage("assets/graphics/buttons/placeholderin.png"),
+    [true] = love.graphics.newImage("assets/graphics/buttons/buttonlightfullin.png")
+  },
 }
 Button.__index = Button
 function Button:new(o)
@@ -17,11 +23,13 @@ function Button:new(o)
 	self.shapeList = convertPointsToList(self.shape)
   self.textX = self.x
   self.textY = self.y
+  self.litUp = false
 	if self.imageUp then
     self.image = self.imageUp
-    self.imgScl = self.height / self.image:getHeight()
-    self.textX = self.x + self.image:getHeight() * self.imgScl * 1.4 + (self.width / 2 - self.image:getHeight() * self.imgScl) - love.graphics.getFont():getWidth(self.text) / 2
-    self.textY = self.y + self.image:getHeight() / 2 * self.imgScl - love.graphics.getFont():getHeight() / 2
+    local img = self.image[self.litUp]
+    self.imgScl = self.height / img:getHeight()
+    self.textX = self.x + img:getHeight() * self.imgScl * 1.4 + (self.width / 2 - img:getHeight() * self.imgScl) - love.graphics.getFont():getWidth(self.text) / 2
+    self.textY = self.y + img:getHeight() / 2 * self.imgScl - love.graphics.getFont():getHeight() / 2
 	end
 	return self
 end
@@ -29,7 +37,7 @@ end
 function Button:draw()
 	if self.image then
 		love.graphics.setColor(255,255,255)
-		love.graphics.draw(self.image, self.x, self.y, 0, self.imgScl)
+		love.graphics.draw(self.image[self.litUp], self.x, self.y, 0, self.imgScl)
 	else
 		love.graphics.polygon("fill", self.shapeList)
 	end
@@ -39,8 +47,15 @@ function Button:draw()
   end
 end
 
+
 function Button:onClick()
 end
+
+
+function Button:setLitUp(bool)
+  self.litUp = bool
+end
+
 
 function Button:onHover(draggable)
   --[[
@@ -68,11 +83,11 @@ function Button:setImageDown()
 end
 
 function Button:mousepressed()
-  self.image = self.imageDown
+  self:setImageDown()
 end
 
 function Button:mousereleased()
-  self.image = self.imageUp
+  self:setImageUp()
 end
 
 function Button:onDragDrop(draggable)

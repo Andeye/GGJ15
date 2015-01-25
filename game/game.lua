@@ -41,7 +41,7 @@ Game = {
   buttonOffsetY = 30,
   buttonList = nil,
   anyButtonClicked = false,
-  ACCUMULATED_TIME_LIMIT = 0,
+  ACCUMULATED_TIME_LIMIT = 3,
   skinColorShader = love.graphics.newShader("assets/shaders/skincolor.glsl"),
   nakedDudeSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet.png"),
   nakedDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/naked_dude_spritesheet_mask.png"),
@@ -78,7 +78,7 @@ local function buttonUpdate(button, f)
     f()
     game.anyButtonPressed = true
     button.isDisabled = true
-    button:setImageDown()
+    button:setLitUp(true)
   end
 end
 
@@ -101,23 +101,17 @@ local function createButton(game, title, f)
     y = game.buttonList[#game.buttonList].y + game.buttonList[#game.buttonList].height + game.buttonOffsetY
   end
 
-  local button = Button:new{
+  local button = Button:new {
     x = x,
     y = y,
     text = title,
-    onClick = function(button)
-      if not game.anyButtonPressed then
-        SoundSfx:play("button_click")
+    mousepressed = function(button)
+      SoundSfx:play("button_click")
+      button:setImageDown()
+      if not button.isDisabled and not game.anyButtonPressed then
+        buttonUpdate(button, f)
       end
-      buttonUpdate(button, f)
-    end, -- eventTrigger,
-    mousereleased = function(button)
-      if button.isDisabled then
-        return
-      else
-        button.image = button.imageUp
-      end
-    end,
+    end, -- eventTrigger,,
     accumulatedTime = 0,
     isDisabled = false,
     accumulate = function(self, dt)
@@ -125,9 +119,8 @@ local function createButton(game, title, f)
         self.accumulatedTime = self.accumulatedTime + dt
         if self.accumulatedTime >= game.ACCUMULATED_TIME_LIMIT then
           self.isDisabled = false
+          self:setLitUp(false)
           game.anyButtonPressed = false
-          self:setImageUp()
-          print("enabled")
           self.accumulatedTime = 0
         end
       end
