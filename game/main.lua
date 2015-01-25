@@ -13,7 +13,7 @@ love.filesystem.load("utility.lua")()
 
 
 function love.livereload()
--- love.load()
+  love.load()
 end
 
 function love.load()

@@ -9,6 +9,8 @@ Character = {
   panic = 10,
   x = 500,
   y = 300,
+  z = 1000,
+  inElevator = false,
   personality = nil,
   tween,
 }
@@ -36,8 +38,9 @@ function Character:move(dx, dy)
   self.y = self.y + dy
 end
 
-function Character:moveTo(x, y)
-  self.tween = tween.new(3, self, {x=x, y=y})
+function Character:moveTo(x, y, z, length)
+  length = length or 3
+  self.tween = tween.new(length, self, {x=x, y=y, z=z})
 end
 
 function Character:addAwkwardness(da)
@@ -115,10 +118,14 @@ function Character:draw()
   local r, g, b = love.graphics.getColor()
   love.graphics.setColor(self.personality.color)
   love.graphics.setShader(game.skinColorShader)
+  local elevatorY = 0
+  if self.inElevator then
+    elevatorY = elevator.y
+  end
   if self:isSpecialAnimationPlaying() then
-    self.specialAnimations[self.currentSpecialAnimationKey]:draw(self.x, self.y, self.isMirrored)
+    self.specialAnimations[self.currentSpecialAnimationKey]:draw(self.x, self.y + elevatorY, self.isMirrored)
   else
-    self.animations[self.currentAnimationKey]:draw(self.x, self.y, self.isMirrored)
+    self.animations[self.currentAnimationKey]:draw(self.x, self.y + elevatorY, self.isMirrored)
   end
   love.graphics.setShader()
   love.graphics.setColor(r, g, b)
@@ -163,7 +170,7 @@ function Character:event(o)
 end
 
 function Character:getZ()
-  return self.y + 1000
+  return self.y + self.z
 end
 
 function Character:mirror()

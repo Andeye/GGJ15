@@ -29,7 +29,7 @@ function Aula:getDrawables()
       draw=draw,
 			getY=function() return self.y end,
 			image=self.auladoorwallImage,
-			getZ=function() return self.y + 2 end,
+			getZ=function() return self.y + 1100 end,
 			0,
 			scale=self.scale
     } , {

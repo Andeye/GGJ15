@@ -22,7 +22,7 @@ love.filesystem.load("event.lua")()
 love.filesystem.load("aula.lua")()
 love.filesystem.load("shaft.lua")()
 
-local elevator = Elevator:new()
+elevator = Elevator:new()
 local aula = Aula:new()
 local shaft = Shaft:new()
 aula.scale = elevator.scale
@@ -53,6 +53,8 @@ Game = {
   shirtDudeSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/shirt_dude_spritesheet_mask.png"),
   flowerLadySpritesheetImage = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet.png"),
   flowerLadySpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/flower_lady_spritesheet_mask.png"),
+  beardGuySpritesheetImage = love.graphics.newImage("assets/graphics/sprites/beard_guy_spritesheet.png"),
+  beardGuySpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/beard_guy_spritesheet_mask.png"),
   mainCharacterFrontsideSpritesheetImage = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet.png"),
   mainCharacterFrontsideSpritesheetImageMask = love.graphics.newImage("assets/graphics/sprites/main_character_front_spritesheet_mask.png"),
   mainCharacterSpecialSpritesheetImage_1 = love.graphics.newImage("assets/graphics/sprites/main_character_special_spritesheet_1.png"),
@@ -98,7 +100,7 @@ end
 
 
 local function createButton(game, title, f)
-  local x = elevator.x + elevator.elevatorImage:getWidth() * elevator.scale + game.buttonOffsetX
+  local x = elevator.x + elevator.elevatorFloor:getWidth() * elevator.scale + game.buttonOffsetX
 
   local y = game.buttonOffsetY
   if #game.buttonList > 0 then
@@ -187,19 +189,15 @@ function Game:new()
   SoundSfx:load()
 
   --
-  -- create the characters
-  --
-  self:createCharacters()
-  -- self:removeCharacters()
-
-  --
   -- Create the player
   --
 
-  self.player = createCharacter(400, 350, self.mainCharacterFrontsideSpritesheetImage, self.mainCharacterFrontsideSpritesheetImageMask)
+  self.player = createCharacter(130, 150, self.mainCharacterFrontsideSpritesheetImage, self.mainCharacterFrontsideSpritesheetImageMask)
   addSpecialSpriteSheets(self, self.player)
   table.insert(self.drawables, self.player)
 
+  self.player.z = 840
+  
   self.buttonList = {}
 
   GUI:addComponent(createButton(self, "Enter",
@@ -209,6 +207,9 @@ function Game:new()
     self:createGameButtons()
     self.started = true
     game.anyButtonPressed = false
+
+    self.player.inElevator = true
+    self.player:moveTo(350, 400, 1000, length)
   end), "enter")
 
   --
@@ -228,7 +229,7 @@ function Game:createCharacters()
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 
-  character = createCharacter(550, 250, self.shirtDudeSpritesheetImage, self.shirtDudeSpritesheetImageMask)
+  character = createCharacter(550, 250, self.beardGuySpritesheetImage, self.beardGuySpritesheetImageMask)
   table.insert(self.characterList, character)
   table.insert(self.drawables, character)
 end
@@ -237,7 +238,7 @@ function Game:removeCharacters()
   for k,v in pairs(self.characterList) do
     for k2,v2 in pairs(self.drawables) do
       if v == v2 then
-        self.drawables[k2] = nil
+        table.remove(self.drawables, k2)
       end
     end
   end
@@ -387,10 +388,10 @@ function Game:update(dt)
     GameState:pop()
     GameState:push("mainMenu")
   end
-  coreLoop(dt)
+  self:coreLoop(dt)
 end
 
-function coreLoop(dt)
+function Game:coreLoop(dt)
   elevator:update(dt)
 end
 
@@ -451,10 +452,12 @@ function Game:startIdleLoop()
       elevator.y = 1000
       elevator:moveTo(0)
       elevator.justMoved = true
+      self:removeCharacters()
     elseif elevator.y == 0 and elevator.justMoved then
       GUI:layerVisible("enter", true)
       self.startIdleTime = 0
       elevator.justMoved = false
+      self:createCharacters()
     elseif elevator.y == 0 then
       GUI:layerVisible("enter", false)
       elevator:moveTo(-1000)
