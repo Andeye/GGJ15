@@ -30,7 +30,7 @@ shaft.scale = elevator.scale
 
 
 Game = {
-  GAME_DURATION = (6 + (4 * math.random() - 2)), --* 60, -- 4 - 8 minutes of gameplay
+  GAME_DURATION = (6 + (4 * math.random() - 2)) * 60, -- 4 - 8 minutes of gameplay
   MINIMI_TIME_BETWEEN_RANDOM_EVENTS = 5,  -- TODO: change this to 20 (or suitable for gameplay)
   accumulatedGameTime = 0,
   accTimeBetweenRandomEvents = 0,
@@ -167,7 +167,7 @@ end
 function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
-  
+
   gameFinished = GameFinished:new()
   GameState:add("gameFinished", gameFinished)
 
@@ -381,11 +381,15 @@ end
 function Game:draw()
   --[[
 
+
   for k,v in pairs(elevator:getDrawables()) do
+
 
     table.insert(self.drawables, v)
 
+
   end
+
 
   --]]
   table.sort(self.drawables, sortZ)
