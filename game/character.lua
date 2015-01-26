@@ -117,11 +117,11 @@ function Character:update(dt)
     end
   end
 
-  dbg:msg("-----------------------------------", "")
-  dbg:msg("currentAnimationKey", self.currentAnimationKey)
-  dbg:msg("-----------------------------------", "")
-  dbg:msg("character.awkward", self.awkward)
-  dbg:msg("character.panic", self.panic)
+--  dbg:msg("-----------------------------------", "")
+--  dbg:msg("currentAnimationKey", self.currentAnimationKey)
+--  dbg:msg("-----------------------------------", "")
+--  dbg:msg("character.awkward", self.awkward)
+--  dbg:msg("character.panic", self.panic)
   
 end
 

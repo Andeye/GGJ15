@@ -177,8 +177,8 @@ function Game:new()
   local self = setmetatable({}, Game)
   self.hover = false
 
-  love.math.setRandomSeed(os.clock()^3)
-  self.GAME_DURATION = (6 + (4 * love.math.random() - 2)) * 60 -- 4 - 8 minutes of gameplay
+--  love.math.setRandomSeed(os.clock()^3)
+  self.GAME_DURATION = 180 -- (6 + (4 * love.math.random() - 2)) * 60 -- 4 - 8 minutes of gameplay
 
   gameFinished = GameFinished:new()
   GameState:add("gameFinished", gameFinished)
@@ -305,12 +305,8 @@ function Game:createGameButtons()
 end
 
 function love.keypressed(key)
---[[
-  if key == "left" then
-    elevator:openDoors()
-  elseif key == "right" then
-    elevator:closeDoors()
-  elseif key == "1" then
+
+  if key == "1" then
     game.characterList[1]:addAwkwardness(-5)
     game.characterList[2]:addAwkwardness(-2.5)
     game.characterList[3]:addAwkwardness(-7.5)
@@ -322,28 +318,8 @@ function love.keypressed(key)
     game.characterList[1]:addPanic(-5)
   elseif key == "4" then
     game.characterList[1]:addPanic(5)
-  elseif key == "8" then
-    game.player:playSpecialAnimation("fart")
-  elseif key == "9" then
-    game.player:playSpecialAnimation("handwave")
-  elseif key == "0" then
-    game.player:playSpecialAnimation("calm_down")
-  elseif key == "f" then
-    SoundSfx:play("fart")
-  elseif key == "m" then
-    game.player:mirror()
-  elseif key == "e" then
-    local newEvent = EventTypes:getEvent(game.player, "dance")
-    for i, character in ipairs(game.characterList) do
-      game.characterList[i]:event(newEvent)
-    end
-  elseif key == "r" then
-    local newEvent = EventTypes:getEvent(self.player, "calm_down")
-    for i, character in ipairs(game.characterList) do
-      game.characterList[i]:event(newEvent)
-    end
   end
-]]
+
 end
 
 local function input(dt)
@@ -384,7 +360,6 @@ local function getRoomStatus(game)
 end
 
 function Game:update(dt)
-  dbg:msg("Game ID", tostring(self.selected))
   dbg:msg("Game time", self.accumulatedGameTime)
   dbg:msg("Game Ends", self.GAME_DURATION)
 
@@ -395,9 +370,9 @@ function Game:update(dt)
     self:idleLoop()
   end
 
-  dbg:msg("startIdleTime", self.startIdleTime)
-  dbg:msg("START_IDLE_ELEVATOR_FREQ", self.START_IDLE_ELEVATOR_FREQ)
-  dbg:msg("elevator.y", elevator.y)
+--  dbg:msg("startIdleTime", self.startIdleTime)
+--  dbg:msg("START_IDLE_ELEVATOR_FREQ", self.START_IDLE_ELEVATOR_FREQ)
+--  dbg:msg("elevator.y", elevator.y)
   if self.startIdleTime > self.START_IDLE_ELEVATOR_FREQ then
     self:startIdleLoop()
   end

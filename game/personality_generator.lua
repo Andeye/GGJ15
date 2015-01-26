@@ -16,13 +16,17 @@ colors[13] = {178, 131, 83}
 
 local VALUE_RANGE = 4
 
+local skinColorChain = {13, 7, 4, 3}
+local index = 0
+
 function PersonalityGenerator:createPersonality(reactToEvent)
   local personality = {
     eventTypeMap = {}
   }
 
-  local index = math.random(1, #colors)
-  personality.color = colors[index]
+--  local index = math.random(1, #colors)
+  index = (index % 4) + 1
+  personality.color = colors[skinColorChain[index]]
 
   personality.reactToEvent = reactToEvent or function(self, event)
 
